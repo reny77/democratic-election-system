@@ -17,7 +17,7 @@ contract("Testing DemocraticMayor", accounts => {
   for (let c of candidates) {
       console.log(c);
   }
-/*
+
   it("Test constructor ok", async function() {
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
   });
@@ -209,7 +209,7 @@ contract("Testing DemocraticMayor", accounts => {
     });
     await truffleAssert.fails(instance.mayor_or_sayonara());
   });
-*/
+
   it("Test view functions", async function() {
     let quorum = 2; // test quorum
     let test_soul = 1000000000000;
@@ -245,10 +245,11 @@ contract("Testing DemocraticMayor", accounts => {
     assert(result_get_candidate_soul.toString(10) == test_soul, "The soul of candidate has error");
 
     const result_get_condition = await instance.get_condition();
-    console.log(result_get_condition);
-    
+    const {0: cond_quorum, 1: cond_envelopes_casted, 2: cond_envelopes_opened} = result_get_condition;
 
-    
+    assert(cond_quorum == quorum, "The quorum condition is not recognize");
+    assert(cond_envelopes_casted == 2, "The envelopes casted are not recognize");
+    assert(cond_envelopes_opened == 2, "The envelopes opened are not recognize");
   });
   
 

@@ -71,8 +71,6 @@ contract("Testing MyContract", accounts => {
 
   it("Testing mayor_or_sayonara: NewMayor is candidate0 by souls", async function() {
     let quorum = 5; // test quorum
-    let confirm = 2;
-    let reject = quorum - confirm;  
 
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
 
@@ -113,8 +111,6 @@ contract("Testing MyContract", accounts => {
 
   it("Testing mayor_or_sayonara: NewMayor is candidate0 by votes, soul tied with candidate 2", async function() {
     let quorum = 5; // test quorum
-    let confirm = 2;
-    let reject = quorum - confirm;  
 
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
 
@@ -155,8 +151,6 @@ contract("Testing MyContract", accounts => {
 
   it("Testing mayor_or_sayonara: no NewMayor but DrawMayor, there is a tie (soul and votes) with candidates 1 and 2", async function() {
     let quorum = 5; // test quorum
-    let confirm = 2;
-    let reject = quorum - confirm;  
 
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
 

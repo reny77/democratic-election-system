@@ -17,7 +17,7 @@ contract("Testing DemocraticMayor", accounts => {
   for (let c of candidates) {
       console.log(c);
   }
-  
+/*
   it("Test constructor ok", async function() {
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
   });
@@ -209,5 +209,47 @@ contract("Testing DemocraticMayor", accounts => {
     });
     await truffleAssert.fails(instance.mayor_or_sayonara());
   });
+*/
+  it("Test view functions", async function() {
+    let quorum = 2; // test quorum
+    let test_soul = 1000000000000;
+
+    const instance = await DemocraticMayor.new(candidates, escrow, quorum);
+    for (let i = 0; i < candidates.length; i++) {
+      await instance.add_deposit({from: candidates[i], value: test_soul * (i + 1)});
+    }
+
+    const result_check_has_voted_false = await instance.check_has_voted(accounts[2 + numberOfCandidates + 1]);
+    assert(result_check_has_voted_false == false, "The account did not vote, but it appears to be");
+
+    // voter1 for candidates[0]
+    const envelops1 = await instance.compute_envelope(100, candidates[0], 500);
+    await instance.cast_envelope(envelops1, { from: accounts[2 + numberOfCandidates + 1] });
+
+    // voter2, candidates[0]
+    const envelops2 = await instance.compute_envelope(200, candidates[0], 500);
+    await instance.cast_envelope(envelops2, { from: accounts[2 + numberOfCandidates + 2] });
+   
+    await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 500 });
+    await instance.open_envelope(200, candidates[0], { from: accounts[2 + numberOfCandidates + 2], value: 500 });
+
+    const result_check_has_voted_true = await instance.check_has_voted(accounts[2 + numberOfCandidates + 1]);
+    assert(result_check_has_voted_true, "The account has voted, but instead it seems not");
+
+    const result_get_candidates = await instance.get_candidates();
+    for (let i = 0; i < candidates.length; i++) {
+      assert(result_get_candidates[i] == candidates[i], "List of candidates not recognize");
+    }
+
+    const result_get_candidate_soul = await instance.get_candidate_soul(candidates[0]);
+    assert(result_get_candidate_soul.toString(10) == test_soul, "The soul of candidate has error");
+
+    const result_get_condition = await instance.get_condition();
+    console.log(result_get_condition);
+    
+
+    
+  });
+  
 
 });

@@ -187,4 +187,27 @@ contract("Testing MyContract", accounts => {
     });
   });
 
+
+  it("Test call mayor_or_sayonara two time", async function() {
+    let quorum = 2; // test quorum
+
+    const instance = await DemocraticMayor.new(candidates, escrow, quorum);
+   
+    // voter1 for candidates[0]
+    const envelops1 = await instance.compute_envelope(100, candidates[0], 500);
+    await instance.cast_envelope(envelops1, { from: accounts[2 + numberOfCandidates + 1] });
+    // voter2, candidates[0]
+    const envelops2 = await instance.compute_envelope(200, candidates[0], 500);
+    await instance.cast_envelope(envelops2, { from: accounts[2 + numberOfCandidates + 2] });
+   
+    await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 500 });
+    await instance.open_envelope(200, candidates[0], { from: accounts[2 + numberOfCandidates + 2], value: 500 });
+
+    const result = await instance.mayor_or_sayonara();
+    truffleAssert.eventEmitted(result, 'NewMayor', (ev) => {
+      return ev._candidate === candidates[0];
+    });
+    await truffleAssert.fails(instance.mayor_or_sayonara());
+  });
+
 });

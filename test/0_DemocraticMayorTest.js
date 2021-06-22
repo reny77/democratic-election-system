@@ -18,7 +18,7 @@ contract("Testing MyContract", accounts => {
       console.log(c);
   }
   
-/*  it("Test constructor ok", async function() {
+  it("Test constructor ok", async function() {
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
   });
 
@@ -50,22 +50,29 @@ contract("Testing MyContract", accounts => {
       truffleAssert.eventEmitted(result, "EnvelopeOpen");
     }
 
-  });*/
+  });
 
-  /*it("Test candidate deposit soul", async function() {
+  it("Test candidate deposit soul", async function() {
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
     for (let i = 0; i < candidates.length; i++) {
       await instance.add_deposit.sendTransaction({from: candidates[i], value: 1000000000000 * (i + 1)});
     }
-  });*/
+  });
 
-  
+  it("Test non-candidate deposit soul", async function() {
+    const instance = await DemocraticMayor.new(candidates, escrow, quorum);
+    await truffleAssert.fails(instance.add_deposit.sendTransaction({from: accounts[10], value: 1000000000000}));    
+  });
 
-  it("Testing mayor_or_sayonara", async function() {
+  it("Test call mayor_or_sayonara without opening the envelopes", async function() {
+    const instance = await DemocraticMayor.new(candidates, escrow, quorum);
+    await truffleAssert.fails(instance.mayor_or_sayonara());
+  });
+
+  it("Testing mayor_or_sayonara: NewMayor is candidate0 by souls", async function() {
     let quorum = 5; // test quorum
     let confirm = 2;
     let reject = quorum - confirm;  
-    let testSoul = 1000; // a base test soul
 
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
 
@@ -75,63 +82,115 @@ contract("Testing MyContract", accounts => {
     }
 
     // voter1 for candidates[0]
-    const envelops1 = await instance.compute_envelope(100, candidates[0], testSoul);
+    const envelops1 = await instance.compute_envelope(100, candidates[0], 1000);
     await instance.cast_envelope(envelops1, { from: accounts[2 + numberOfCandidates + 1] });
-    
-    
-    // voter2, candidates[0]
-    const envelops2 = await instance.compute_envelope(200, candidates[0], testSoul);
+    // voter2, candidates[1]
+    const envelops2 = await instance.compute_envelope(200, candidates[1], 200);
     await instance.cast_envelope(envelops2, { from: accounts[2 + numberOfCandidates + 2] });
-    
-
-    // voter3, candidates[1]
-    const envelops3 = await instance.compute_envelope(300, candidates[1], testSoul);
+    // voter3, candidates[2]
+    const envelops3 = await instance.compute_envelope(300, candidates[2], 300);
     await instance.cast_envelope(envelops3, { from: accounts[2 + numberOfCandidates + 3] });
-    
-    // voter4, candidates[2]
-    const envelops4 = await instance.compute_envelope(400, candidates[2], testSoul);
-    await instance.cast_envelope(envelops4, { from: accounts[2 + numberOfCandidates + 4] });
-    
-
-    // voter5, candidates[3]
-    const envelops5 = await instance.compute_envelope(500, candidates[3], testSoul);
+    // voter4, candidates[3]
+    const envelops4 = await instance.compute_envelope(400, candidates[3], 400);
+    await instance.cast_envelope(envelops4, { from: accounts[2 + numberOfCandidates + 4] }); 
+    // voter5, candidates[4]
+    const envelops5 = await instance.compute_envelope(500, candidates[4], 500);
     await instance.cast_envelope(envelops5, { from: accounts[2 + numberOfCandidates + 5] });
 
-    await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: testSoul });
-    await instance.open_envelope(200, candidates[0], { from: accounts[2 + numberOfCandidates + 2], value: testSoul });
-    await instance.open_envelope(300, candidates[1], { from: accounts[2 + numberOfCandidates + 3], value: testSoul });
-    await instance.open_envelope(400, candidates[2], { from: accounts[2 + numberOfCandidates + 4], value: testSoul });
-    await instance.open_envelope(500, candidates[3], { from: accounts[2 + numberOfCandidates + 5], value: testSoul });
+    await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 1000 });
+    await instance.open_envelope(200, candidates[1], { from: accounts[2 + numberOfCandidates + 2], value: 200 });
+    await instance.open_envelope(300, candidates[2], { from: accounts[2 + numberOfCandidates + 3], value: 300 });
+    await instance.open_envelope(400, candidates[3], { from: accounts[2 + numberOfCandidates + 4], value: 400 });
+    await instance.open_envelope(500, candidates[4], { from: accounts[2 + numberOfCandidates + 5], value: 500 });
     
     const result = await instance.mayor_or_sayonara();    
-    //truffleAssert.eventEmitted(result, "Sayonara");
+    truffleAssert.eventEmitted(result, 'NewMayor', (ev) => {
+      return ev._candidate === candidates[0];
+    });
   });
 
 
 
+  it("Testing mayor_or_sayonara: NewMayor is candidate0 by votes, soul tied with candidate 2", async function() {
+    let quorum = 5; // test quorum
+    let confirm = 2;
+    let reject = quorum - confirm;  
 
-/*
-
-  it("Test call mayor_or_sayonara without opening the envelopes", async function() {
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
-    await truffleAssert.fails(instance.mayor_or_sayonara());
+
+    // candidate deposit souls
+    for (let i = 0; i < candidates.length; i++) {
+      await instance.add_deposit({from: candidates[i], value: 1000000000000 * (i + 1)});
+    }
+
+    // voter1 for candidates[0]
+    const envelops1 = await instance.compute_envelope(100, candidates[0], 500);
+    await instance.cast_envelope(envelops1, { from: accounts[2 + numberOfCandidates + 1] });
+    // voter2, candidates[0]
+    const envelops2 = await instance.compute_envelope(200, candidates[0], 500);
+    await instance.cast_envelope(envelops2, { from: accounts[2 + numberOfCandidates + 2] });
+    // voter3, candidates[1]
+    const envelops3 = await instance.compute_envelope(300, candidates[1], 1000);
+    await instance.cast_envelope(envelops3, { from: accounts[2 + numberOfCandidates + 3] });
+    // voter4, candidates[2]
+    const envelops4 = await instance.compute_envelope(400, candidates[2], 400);
+    await instance.cast_envelope(envelops4, { from: accounts[2 + numberOfCandidates + 4] });
+    // voter5, candidates[3]
+    const envelops5 = await instance.compute_envelope(500, candidates[3], 500);
+    await instance.cast_envelope(envelops5, { from: accounts[2 + numberOfCandidates + 5] });
+
+
+    await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 500 });
+    await instance.open_envelope(200, candidates[0], { from: accounts[2 + numberOfCandidates + 2], value: 500 });
+    await instance.open_envelope(300, candidates[1], { from: accounts[2 + numberOfCandidates + 3], value: 1000 });
+    await instance.open_envelope(400, candidates[2], { from: accounts[2 + numberOfCandidates + 4], value: 400 });
+    await instance.open_envelope(500, candidates[3], { from: accounts[2 + numberOfCandidates + 5], value: 500 });
+    
+    const result = await instance.mayor_or_sayonara();    
+    truffleAssert.eventEmitted(result, 'NewMayor', (ev) => {
+      return ev._candidate === candidates[0];
+    });
   });
 
-  it("Test call mayor_or_sayonara with a winner, say 'NewMayor'", async function() {
+
+  it("Testing mayor_or_sayonara: no NewMayor but DrawMayor, there is a tie (soul and votes) with candidates 1 and 2", async function() {
+    let quorum = 5; // test quorum
+    let confirm = 2;
+    let reject = quorum - confirm;  
+
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
 
-    for (let i = 0; i < quorum; i++) {
-      const envelops = await instance.compute_envelope(i, candidates[0], (i + 1) * testSoul);
-      await instance.cast_envelope(envelops, { from: accounts[i + 2] });
+    // candidate deposit souls
+    for (let i = 0; i < candidates.length; i++) {
+      await instance.add_deposit({from: candidates[i], value: 1000000000000 * (i + 1)});
     }
 
-    for (let i = 0; i < quorum; i++) {
-      await instance.open_envelope(i, candidates[0], { from: accounts[i + 2], value: (i + 1) * testSoul });
-    }
-    const result = await instance.mayor_or_sayonara();
+    // voter1 for candidates[0]
+    const envelops1 = await instance.compute_envelope(100, candidates[0], 500);
+    await instance.cast_envelope(envelops1, { from: accounts[2 + numberOfCandidates + 1] });
+    // voter2, candidates[0]
+    const envelops2 = await instance.compute_envelope(200, candidates[0], 500);
+    await instance.cast_envelope(envelops2, { from: accounts[2 + numberOfCandidates + 2] });
+    // voter3, candidates[1]
+    const envelops3 = await instance.compute_envelope(300, candidates[1], 300);
+    await instance.cast_envelope(envelops3, { from: accounts[2 + numberOfCandidates + 3] });    
+    // voter4, candidates[1]
+    const envelops4 = await instance.compute_envelope(400, candidates[1], 700);
+    await instance.cast_envelope(envelops4, { from: accounts[2 + numberOfCandidates + 4] });
+    // voter5, candidates[3]
+    const envelops5 = await instance.compute_envelope(500, candidates[3], 500);
+    await instance.cast_envelope(envelops5, { from: accounts[2 + numberOfCandidates + 5] });
 
-    truffleAssert.eventEmitted(result, "NewMayor");
-  });*/
-
+    await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 500 });
+    await instance.open_envelope(200, candidates[0], { from: accounts[2 + numberOfCandidates + 2], value: 500 });
+    await instance.open_envelope(300, candidates[1], { from: accounts[2 + numberOfCandidates + 3], value: 300 });
+    await instance.open_envelope(400, candidates[1], { from: accounts[2 + numberOfCandidates + 4], value: 700 });
+    await instance.open_envelope(500, candidates[3], { from: accounts[2 + numberOfCandidates + 5], value: 500 });
+    
+    const result = await instance.mayor_or_sayonara();    
+    truffleAssert.eventEmitted(result, 'DrawMayor', (ev) => {
+      return ev._candidates[0] === candidates[0] && ev._candidates[1] === candidates[1];
+    });
+  });
 
 });

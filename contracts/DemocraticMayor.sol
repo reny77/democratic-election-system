@@ -276,7 +276,6 @@ contract DemocraticMayor {
     }
     
     // some view functions for DAPP
-
     function get_candidates() public view returns (address[] memory) {
         return candidates_list;
     }

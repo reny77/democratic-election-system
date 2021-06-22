@@ -2,7 +2,7 @@ const truffleAssert = require('truffle-assertions');
 
 const DemocraticMayor = artifacts.require('DemocraticMayor')
 
-contract("Testing MyContract", accounts => {
+contract("Testing DemocraticMayor", accounts => {
   
   let deployerAddress = accounts[0]; // smart contract deployer address
 

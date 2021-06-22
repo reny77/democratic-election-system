@@ -3,7 +3,7 @@ pragma solidity 0.8.1;
 
 contract DemocraticMayor {
 
-     address owner;
+     address election_master;
 
     // Structs, events, and modifiers    
     // Store refund data
@@ -23,16 +23,16 @@ contract DemocraticMayor {
 
     // information about a candidate
     struct Candidate {
-        address payable symbol;
+        address symbol;
         uint personal_souls;
         uint voters_souls;
         uint32 nvoters;        
-        address payable[] voters;
+        address[] voters;
     }
     
     event NewMayor(address _candidate);
     event DrawMayor(address[] _candidates);
-    event Sayonara(address _escrow);
+    event CandidateDeposit(address _candidate, uint _tot_val);
     event EnvelopeCast(address _voter);
     event EnvelopeOpen(address _voter, uint _soul, address _symbol);
     
@@ -57,11 +57,18 @@ contract DemocraticMayor {
         require(voting_condition.envelopes_opened == voting_condition.quorum, "Cannot check the winner, need to open all the sent envelopes");
         _;
     }
+
+
+
+    modifier checkCandidate() {
+        require(candidates[msg.sender].symbol != address(0), "The sender is not a candidate");
+        _;
+    }
     
     // State attributes
     
     // Initialization variables
-    address payable[] public candidates_list;    
+    address[] public candidates_list;    
     mapping(address => Candidate) candidates;
     address payable public escrow;
     
@@ -84,22 +91,22 @@ contract DemocraticMayor {
     /// @param _candidates (address) The addresses of the mayor candidates
     /// @param _escrow (address) The address of the escrow account
     /// @param _quorum (address) The number of voters required to finalize the confirmation
-    constructor(address payable[] memory _candidates, uint32[] memory soul_candidates, address payable _escrow, uint32 _quorum) {          
+    constructor(address[] memory _candidates, address payable _escrow, uint32 _quorum) {          
         // TODO: check minum number of candidate???
+
+        // set address of deployer (the election_master)
+        election_master = msg.sender;
 
         // init candidates list
         for (uint i = 0; i < _candidates.length; i++) {   
-            
-            // check soul_candidates is gt 0, proposal #1    
-            require(soul_candidates[i] > 0, "Soul must be greater than 0");
 
             // init candidates  
             candidates[_candidates[i]] = Candidate({ 
                                                     symbol: _candidates[i],
-                                                    personal_souls: soul_candidates[i],
+                                                    personal_souls: 0,
                                                     voters_souls: 0,
                                                     nvoters: 0, 
-                                                    voters: new address payable[](0)
+                                                    voters: new address[](0)
                                                 });
         }
         candidates_list = _candidates;
@@ -112,7 +119,12 @@ contract DemocraticMayor {
                                         envelopes_opened: 0, 
                                         winner_checked: false
                                     });
-       // TODO: emit event?
+    }
+
+
+    function add_deposit() checkCandidate public payable {
+        candidates[msg.sender].personal_souls += msg.value;
+        emit CandidateDeposit(msg.sender, candidates[msg.sender].personal_souls);
     }
 
 
@@ -220,35 +232,39 @@ contract DemocraticMayor {
         } else {
             no_winners();
             emit DrawMayor(winner_list_by_votes);
-        }
-
-        /*
-        // first, transfer soul to loosers
-        for (uint i = 0; i < voters.length; i++) {          
-            if (souls[payable(voters[i])].doblon != confirmed) {  // if this                      
-                payable(voters[i]).transfer(souls[payable(voters[i])].soul);  // returns soul to users
-            }
-        }
-
-        if (confirmed) { 
-            candidate.transfer(yaySoul); // transfer yaySoul fund to candidate
-            emit NewMayor(candidate); // event if the candidate is confirmed as mayor
-        } else {
-            escrow.transfer(naySoul); // transfer naySoul fund to escrow
-            emit Sayonara(escrow); // event if the candidate is NOT confirmed as mayor  
-        }*/
+        }       
 
     }
    
-    function pay_electors_and_winner(address winner_symbol) private pure {
-        // first, pay electors
+    function pay_electors_and_winner(address winner_symbol) private  {
+        // first: pay electors
+        Candidate memory tmpCandidate = candidates[winner_symbol];
+        uint soul_for_electors = tmpCandidate.personal_souls / tmpCandidate.nvoters; 
+        for (uint32 j = 0; j < tmpCandidate.voters.length; j++) {
+            address voter = tmpCandidate.voters[j];            
+            payable(voter).transfer(soul_for_electors);
+        }
 
-        // second, pay the winner
-
+        // second: pay the winner
+        for (uint i = 0; i < candidates_list.length; i++) {            
+            if (candidates_list[i] != winner_symbol) {
+                Candidate memory tmpLooser = candidates[candidates_list[i]];
+                payable(winner_symbol).transfer(tmpLooser.personal_souls);
+            }
+        }   
     }
  
-    function no_winners() private pure {
-        
+    function no_winners() private returns (bool) {
+        uint total_souls = 0;
+        for (uint i = 0; i < candidates_list.length; i++) {  
+            Candidate memory tmpCandidate = candidates[candidates_list[i]];
+            for (uint32 j = 0; j < tmpCandidate.voters.length; j++) {
+                address voter = tmpCandidate.voters[j];
+                total_souls += souls[voter].soul; // voters souls
+            }
+           total_souls +=  tmpCandidate.personal_souls;  // candidate souls
+        }
+        return escrow.send(total_souls);        
     }
  
     /// @notice Compute a voting envelope
@@ -259,7 +275,21 @@ contract DemocraticMayor {
         return keccak256(abi.encode(_sigil, _symbol, _soul));
     }
     
+    // some view functions for DAPP
 
+    function get_candidates() public view returns (address[] memory) {
+        return candidates_list;
+    }
 
+    function get_candidate_soul(address _addr) public view returns (uint) {
+        return candidates[_addr].personal_souls;
+    }
 
+    function get_condition() public view returns (uint32, uint32, uint32) {
+        return (voting_condition.quorum, voting_condition.envelopes_casted, voting_condition.envelopes_opened);
+    }
+
+    function check_has_voted(address _address) public view returns(bool) {
+        return souls[_address].symbol != address(0);
+    }
 }

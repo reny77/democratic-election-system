@@ -9,7 +9,8 @@
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="css/dapp.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -23,10 +24,71 @@
         <div class="col-xs-12 col-sm-8 col-sm-push-2">
           <h1 class="text-center">Valadilène Democratic Election System</h1>
           <hr/>
-          <h3 class="text-center" id="accountId">Your address: </h3>
+          <h3 class="text-center">You are <b>Voter</b></h3>
+          <h4 class="text-center" id="accountId">Your address: </h4>
           <br/>
         </div>
       </div>
+      
+      <div class="row" >
+          <div class="col-lg-4 col-sm-6">
+            <div class="circle-tile">
+                <a href="#">
+                    <div class="circle-tile-heading orange">
+                        <i class="fa fa-bell fa-fw fa-3x"></i>
+                    </div>
+                </a>
+                <div class="circle-tile-content orange">
+                    <div class="circle-tile-description text-faded">
+                        Quorum
+                    </div>
+                    <div class="circle-tile-number text-faded">
+                      <span id="quorumId">0</span>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-sm-6">
+              <div class="circle-tile">
+                  <a href="#">
+                      <div class="circle-tile-heading dark-blue">
+                          <i class="fa fa-envelope fa-fw fa-3x"></i>
+                      </div>
+                  </a>
+                  <div class="circle-tile-content dark-blue">
+                      <div class="circle-tile-description text-faded">
+                          Envelop casted
+                      </div>
+                      <div class="circle-tile-number text-faded">
+                        <span id="envelopCastedId">0</span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-4 col-sm-6">
+              <div class="circle-tile">
+                  <a href="#">
+                      <div class="circle-tile-heading green">                          
+                        <i class="fa fa-envelope-open  fa-fw fa-3x"></i>
+                      </div>
+                  </a>
+                  <div class="circle-tile-content green">
+                      <div class="circle-tile-description text-faded">
+                          Envelop opened
+                      </div>
+                      <div class="circle-tile-number text-faded">
+                        <span id="envelopOpenedId">0</span>
+                      </div>
+                  </div>
+              </div>
+          </div>          
+    </div>
+
+
+
+
+
+
 
       <div id="candidatesRow" class="row">
         <!-- CANDIDATES LOAD HERE -->

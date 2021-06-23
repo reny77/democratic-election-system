@@ -2,7 +2,7 @@ App = {
 
     contracts: {},
     web3Provider: null,             // Web3 provider
-    url: 'http://0.0.0.0:8545',   // Url for web3
+    url: 'http://0.0.0.0:8545',     // Url for web3
     account: '0x0',                 // current ethereum account
 
     init: function() {
@@ -16,8 +16,6 @@ App = {
         // console.log(web3);
         
         if(typeof web3 != 'undefined') {
-//            App.web3Provider = web3.currentProvider;
-//            web3 = new Web3(web3.currentProvider);
             App.web3Provider = window.ethereum; // !! new standard for modern eth browsers (2/11/18)
             web3 = new Web3(App.web3Provider);
             try {
@@ -65,6 +63,13 @@ App = {
         var candidatesRow = $('#candidatesRow');
         var candidateTemplate = $('#candidateTemplate');
         App.contracts["Contract"].deployed().then(async (instance) => {
+            const result_get_condition = await instance.get_condition();
+            const {0: cond_quorum, 1: cond_envelopes_casted, 2: cond_envelopes_opened} = result_get_condition;
+            $("#quorumId").html(cond_quorum.toString());
+            $("#envelopCastedId").html(cond_envelopes_casted.toString());
+            $("#envelopOpenedId").html(cond_envelopes_opened.toString());
+
+
             const candidates = await  instance.get_candidates();
             for (let i = 0; i < candidates.length; i++) {
                 const result_get_candidate_soul = await instance.get_candidate_soul(candidates[i]);
@@ -89,10 +94,24 @@ App = {
     } 
 }
 
+// handle change account on MetaMask
+ethereum.on('accountsChanged', function (accounts) {
+    const account = accounts[0];
+    $("#accountId").html("Your address: " + account);
+    App.contracts["Contract"].deployed().then(async (instance) => {
+        const result_get_condition = await instance.get_condition();
+        const {0: cond_quorum, 1: cond_envelopes_casted, 2: cond_envelopes_opened} = result_get_condition;
+        $("#quorumId").html(cond_quorum.toString());
+        $("#envelopCastedId").html(cond_envelopes_casted.toString());
+        $("#envelopOpenedId").html(cond_envelopes_opened.toString());
+       
+    });
+
+})
+
 // Call init whenever the window loads
 $(function() {
     $(window).on('load', function () {
-
         App.init();
     });
 });

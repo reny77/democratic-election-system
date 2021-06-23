@@ -16,12 +16,12 @@ App = {
         // console.log(web3);
         
         if(typeof web3 != 'undefined') {
-            App.web3Provider = window.ethereum; // !! new standard for modern eth browsers (2/11/18)
+            App.web3Provider = window.ethereum;
             web3 = new Web3(App.web3Provider);
             try {
-                    ethereum.enable().then(async() => {
-                        console.log("DApp connected to Metamask");
-                    });
+                ethereum.enable().then(async() => {
+                    console.log("DApp connected to Metamask");
+                });
             }
             catch(error) {
                 console.log(error);
@@ -34,14 +34,11 @@ App = {
         return App.initContract();
     },
 
-    /* Upload the contract's abstractions */
     initContract: function() {
-
         // Get current account
         web3.eth.getCoinbase(function(err, account) {
-            if(err == null) {
+            if (err == null) {
                 App.account = account;
-                $("#accountId").html("Your address: " + account);
             }
         });
 
@@ -60,21 +57,45 @@ App = {
 
     // Get a value from the smart contract
     render: function() {
+        // Get current account
+        web3.eth.getCoinbase(function(err, account) {
+            if (err == null) {
+                App.account = account;
+                $("#accountId").html(account);
+            }
+        });
+
         var candidatesRow = $('#candidatesRow');
         var candidateTemplate = $('#candidateTemplate');
         App.contracts["Contract"].deployed().then(async (instance) => {
+            const candidates = await  instance.get_candidates();
+
+            //
+            const is_owner = await instance.is_owner({from: App.account});
+            if (is_owner) {
+                $("#roleId").html("Owner");
+            } else {
+                const is_candidate = await instance.is_candidate({from: App.account});
+                if (is_candidate) {
+                    $("#roleId").html("Candidate " + candidates.indexOf(App.account));
+                } else {
+                    $("#roleId").html("Citizen");
+                }
+            }
+
+            // retrive vote conditions and status
             const result_get_condition = await instance.get_condition();
             const {0: cond_quorum, 1: cond_envelopes_casted, 2: cond_envelopes_opened} = result_get_condition;
             $("#quorumId").html(cond_quorum.toString());
             $("#envelopCastedId").html(cond_envelopes_casted.toString());
             $("#envelopOpenedId").html(cond_envelopes_opened.toString());
 
-
-            const candidates = await  instance.get_candidates();
+            // empty candidates list
+            candidatesRow.empty();
             for (let i = 0; i < candidates.length; i++) {
                 const result_get_candidate_soul = await instance.get_candidate_soul(candidates[i]);
 
-                candidateTemplate.find('img').attr('src', 'https://avatars.dicebear.com/api/human/' + candidates[i] + '.svg');
+                candidateTemplate.find('img').attr('src', 'https://avatars.dicebear.com/api/micah/' + candidates[i] + '.svg');
                 candidateTemplate.find('.panel-title').text('Candidate ' + i);
                 candidateTemplate.find('.candidate-symbol').text(candidates[i]);
                 candidateTemplate.find('.candidate-deposit').text(result_get_candidate_soul.toString(10));
@@ -96,18 +117,10 @@ App = {
 
 // handle change account on MetaMask
 ethereum.on('accountsChanged', function (accounts) {
-    const account = accounts[0];
-    $("#accountId").html("Your address: " + account);
-    App.contracts["Contract"].deployed().then(async (instance) => {
-        const result_get_condition = await instance.get_condition();
-        const {0: cond_quorum, 1: cond_envelopes_casted, 2: cond_envelopes_opened} = result_get_condition;
-        $("#quorumId").html(cond_quorum.toString());
-        $("#envelopCastedId").html(cond_envelopes_casted.toString());
-        $("#envelopOpenedId").html(cond_envelopes_opened.toString());
-       
-    });
-
-})
+	const account = accounts[0];
+    App.account = account;
+    App.render();
+});
 
 // Call init whenever the window loads
 $(function() {

@@ -291,4 +291,14 @@ contract DemocraticMayor {
     function check_has_voted(address _address) public view returns(bool) {
         return souls[_address].symbol != address(0);
     }
+
+    function is_owner() public view returns(bool) {
+        return msg.sender == election_master;
+    }
+
+    function is_candidate() public view returns(bool) {
+        return candidates[msg.sender].symbol != address(0);
+    }
+
+
 }

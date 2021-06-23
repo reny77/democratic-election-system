@@ -11,7 +11,7 @@ contract("Testing DemocraticMayor", accounts => {
   let numberOfCandidates = 5 // number of candidates
   let candidates = accounts.slice(2, 2 + numberOfCandidates); // get addresses of candidates
 
-  let quorum = 8; // test quorum
+  let quorum = 5; // test quorum
   let testSoul = 1000; // a base test soul
 
   for (let c of candidates) {
@@ -250,6 +250,18 @@ contract("Testing DemocraticMayor", accounts => {
     assert(cond_quorum == quorum, "The quorum condition is not recognize");
     assert(cond_envelopes_casted == 2, "The envelopes casted are not recognize");
     assert(cond_envelopes_opened == 2, "The envelopes opened are not recognize");
+
+
+    const result_is_owner = await instance.is_owner({from: accounts[0]});
+    assert(result_is_owner, "The user should be the owner, but it is not");
+    const result_is_not_owner = await instance.is_owner({from: accounts[1]});
+    assert(result_is_not_owner == false, "The user should not be the owner, but it is");
+
+
+    const result_is_candidate = await instance.is_candidate({from: accounts[2]});
+    assert(result_is_candidate, "The user should be a candidate, but it is not");
+    const result_is_not_candidate = await instance.is_candidate({from: accounts[10]});
+    assert(result_is_not_candidate == false, "The user should not be a candidate, but it is");
   });
   
 

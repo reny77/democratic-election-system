@@ -116,14 +116,16 @@ App = {
     },
     voteClick: function() {
         App.contracts["Contract"].deployed().then(async(instance) =>{
-            //await instance.pressClick({from: App.account});
+            const envelop = await instance.compute_envelope($('#voter-sigil').val(), $('#candidate-address').val(), $('#voter-soul').val());
+            const result = await instance.cast_envelope(envelop, { from: App.account });
         });
     } ,
     depositClick: function() {
         App.contracts["Contract"].deployed().then(async(instance) =>{
-            //await instance.pressClick({from: App.account});
-            await instance.add_deposit.sendTransaction({from: App.account, value: $('#deposit-soul').val()});
-            App.render();
+            await instance.add_deposit.sendTransaction({from: App.account, value: $('#deposit-soul').val()})
+            .then(function(receipt){
+                location.reload();
+            });
         });
     } 
 }
@@ -137,12 +139,21 @@ ethereum.on('accountsChanged', function (accounts) {
 
 $('#depositModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget) // Button that triggered the modal
-    var recipient = button.data('address') // Extract info from data-* attributes
+    var address = button.data('address') // Extract info from data-* attributes
     // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
     // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
     var modal = $(this)
-    modal.find('.modal-title').text('New deposit to ' + recipient)
-  })
+    modal.find('.modal-title').text('New deposit to ' + address)
+});
+
+$('#voteModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var address = button.data('address') // Extract info from data-* attributes
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    modal.find('.modal-title').text('Vote: ' + address)
+});
 
 // Call init whenever the window loads
 $(function() {

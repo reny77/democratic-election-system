@@ -24,15 +24,15 @@ contract("Testing DemocraticMayor", accounts => {
 
   it("Test cast envelop", async function() {
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
-    const envelops = await instance.compute_envelope(100, candidates[0], testSoul);
-    const result = await instance.cast_envelope(envelops);
+    const envelop = await instance.compute_envelope(100, candidates[0], testSoul);
+    const result = await instance.cast_envelope(envelop);
     truffleAssert.eventEmitted(result, "EnvelopeCast");
   });
 
   it("Test open_envelope without reaching quorum", async function() {
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
-    const envelops = await instance.compute_envelope(100, candidates[0], testSoul);
-    await instance.cast_envelope(envelops);
+    const envelop = await instance.compute_envelope(100, candidates[0], testSoul);
+    await instance.cast_envelope(envelop);
     await truffleAssert.fails(instance.open_envelope.call(100, candidates[0], { value: testSoul }));
   });
 
@@ -40,8 +40,8 @@ contract("Testing DemocraticMayor", accounts => {
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
 
     for (let i = 0; i < quorum; i++) {
-      const envelops = await instance.compute_envelope(i, candidates[0], (i + 1) * testSoul);
-      const result = await instance.cast_envelope(envelops, { from: accounts[i + 2] });
+      const envelop = await instance.compute_envelope(i, candidates[0], (i + 1) * testSoul);
+      const result = await instance.cast_envelope(envelop, { from: accounts[i + 2] });
  
     }
 
@@ -80,20 +80,20 @@ contract("Testing DemocraticMayor", accounts => {
     }
 
     // voter1 for candidates[0]
-    const envelops1 = await instance.compute_envelope(100, candidates[0], 1000);
-    await instance.cast_envelope(envelops1, { from: accounts[2 + numberOfCandidates + 1] });
+    const envelop1 = await instance.compute_envelope(100, candidates[0], 1000);
+    await instance.cast_envelope(envelop1, { from: accounts[2 + numberOfCandidates + 1] });
     // voter2, candidates[1]
-    const envelops2 = await instance.compute_envelope(200, candidates[1], 200);
-    await instance.cast_envelope(envelops2, { from: accounts[2 + numberOfCandidates + 2] });
+    const envelop2 = await instance.compute_envelope(200, candidates[1], 200);
+    await instance.cast_envelope(envelop2, { from: accounts[2 + numberOfCandidates + 2] });
     // voter3, candidates[2]
-    const envelops3 = await instance.compute_envelope(300, candidates[2], 300);
-    await instance.cast_envelope(envelops3, { from: accounts[2 + numberOfCandidates + 3] });
+    const envelop3 = await instance.compute_envelope(300, candidates[2], 300);
+    await instance.cast_envelope(envelop3, { from: accounts[2 + numberOfCandidates + 3] });
     // voter4, candidates[3]
-    const envelops4 = await instance.compute_envelope(400, candidates[3], 400);
-    await instance.cast_envelope(envelops4, { from: accounts[2 + numberOfCandidates + 4] }); 
+    const envelop4 = await instance.compute_envelope(400, candidates[3], 400);
+    await instance.cast_envelope(envelop4, { from: accounts[2 + numberOfCandidates + 4] }); 
     // voter5, candidates[4]
-    const envelops5 = await instance.compute_envelope(500, candidates[4], 500);
-    await instance.cast_envelope(envelops5, { from: accounts[2 + numberOfCandidates + 5] });
+    const envelop5 = await instance.compute_envelope(500, candidates[4], 500);
+    await instance.cast_envelope(envelop5, { from: accounts[2 + numberOfCandidates + 5] });
 
     await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 1000 });
     await instance.open_envelope(200, candidates[1], { from: accounts[2 + numberOfCandidates + 2], value: 200 });
@@ -120,20 +120,20 @@ contract("Testing DemocraticMayor", accounts => {
     }
 
     // voter1 for candidates[0]
-    const envelops1 = await instance.compute_envelope(100, candidates[0], 500);
-    await instance.cast_envelope(envelops1, { from: accounts[2 + numberOfCandidates + 1] });
+    const envelop1 = await instance.compute_envelope(100, candidates[0], 500);
+    await instance.cast_envelope(envelop1, { from: accounts[2 + numberOfCandidates + 1] });
     // voter2, candidates[0]
-    const envelops2 = await instance.compute_envelope(200, candidates[0], 500);
-    await instance.cast_envelope(envelops2, { from: accounts[2 + numberOfCandidates + 2] });
+    const envelop2 = await instance.compute_envelope(200, candidates[0], 500);
+    await instance.cast_envelope(envelop2, { from: accounts[2 + numberOfCandidates + 2] });
     // voter3, candidates[1]
-    const envelops3 = await instance.compute_envelope(300, candidates[1], 1000);
-    await instance.cast_envelope(envelops3, { from: accounts[2 + numberOfCandidates + 3] });
+    const envelop3 = await instance.compute_envelope(300, candidates[1], 1000);
+    await instance.cast_envelope(envelop3, { from: accounts[2 + numberOfCandidates + 3] });
     // voter4, candidates[2]
-    const envelops4 = await instance.compute_envelope(400, candidates[2], 400);
-    await instance.cast_envelope(envelops4, { from: accounts[2 + numberOfCandidates + 4] });
+    const envelop4 = await instance.compute_envelope(400, candidates[2], 400);
+    await instance.cast_envelope(envelop4, { from: accounts[2 + numberOfCandidates + 4] });
     // voter5, candidates[3]
-    const envelops5 = await instance.compute_envelope(500, candidates[3], 500);
-    await instance.cast_envelope(envelops5, { from: accounts[2 + numberOfCandidates + 5] });
+    const envelop5 = await instance.compute_envelope(500, candidates[3], 500);
+    await instance.cast_envelope(envelop5, { from: accounts[2 + numberOfCandidates + 5] });
 
 
     await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 500 });
@@ -160,20 +160,20 @@ contract("Testing DemocraticMayor", accounts => {
     }
 
     // voter1 for candidates[0]
-    const envelops1 = await instance.compute_envelope(100, candidates[0], 500);
-    await instance.cast_envelope(envelops1, { from: accounts[2 + numberOfCandidates + 1] });
+    const envelop1 = await instance.compute_envelope(100, candidates[0], 500);
+    await instance.cast_envelope(envelop1, { from: accounts[2 + numberOfCandidates + 1] });
     // voter2, candidates[0]
-    const envelops2 = await instance.compute_envelope(200, candidates[0], 500);
-    await instance.cast_envelope(envelops2, { from: accounts[2 + numberOfCandidates + 2] });
+    const envelop2 = await instance.compute_envelope(200, candidates[0], 500);
+    await instance.cast_envelope(envelop2, { from: accounts[2 + numberOfCandidates + 2] });
     // voter3, candidates[1]
-    const envelops3 = await instance.compute_envelope(300, candidates[1], 300);
-    await instance.cast_envelope(envelops3, { from: accounts[2 + numberOfCandidates + 3] });    
+    const envelop3 = await instance.compute_envelope(300, candidates[1], 300);
+    await instance.cast_envelope(envelop3, { from: accounts[2 + numberOfCandidates + 3] });    
     // voter4, candidates[1]
-    const envelops4 = await instance.compute_envelope(400, candidates[1], 700);
-    await instance.cast_envelope(envelops4, { from: accounts[2 + numberOfCandidates + 4] });
+    const envelop4 = await instance.compute_envelope(400, candidates[1], 700);
+    await instance.cast_envelope(envelop4, { from: accounts[2 + numberOfCandidates + 4] });
     // voter5, candidates[3]
-    const envelops5 = await instance.compute_envelope(500, candidates[3], 500);
-    await instance.cast_envelope(envelops5, { from: accounts[2 + numberOfCandidates + 5] });
+    const envelop5 = await instance.compute_envelope(500, candidates[3], 500);
+    await instance.cast_envelope(envelop5, { from: accounts[2 + numberOfCandidates + 5] });
 
     await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 500 });
     await instance.open_envelope(200, candidates[0], { from: accounts[2 + numberOfCandidates + 2], value: 500 });
@@ -194,11 +194,11 @@ contract("Testing DemocraticMayor", accounts => {
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
    
     // voter1 for candidates[0]
-    const envelops1 = await instance.compute_envelope(100, candidates[0], 500);
-    await instance.cast_envelope(envelops1, { from: accounts[2 + numberOfCandidates + 1] });
+    const envelop1 = await instance.compute_envelope(100, candidates[0], 500);
+    await instance.cast_envelope(envelop1, { from: accounts[2 + numberOfCandidates + 1] });
     // voter2, candidates[0]
-    const envelops2 = await instance.compute_envelope(200, candidates[0], 500);
-    await instance.cast_envelope(envelops2, { from: accounts[2 + numberOfCandidates + 2] });
+    const envelop2 = await instance.compute_envelope(200, candidates[0], 500);
+    await instance.cast_envelope(envelop2, { from: accounts[2 + numberOfCandidates + 2] });
    
     await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 500 });
     await instance.open_envelope(200, candidates[0], { from: accounts[2 + numberOfCandidates + 2], value: 500 });
@@ -223,12 +223,12 @@ contract("Testing DemocraticMayor", accounts => {
     assert(result_check_has_voted_false == false, "The account did not vote, but it appears to be");
 
     // voter1 for candidates[0]
-    const envelops1 = await instance.compute_envelope(100, candidates[0], 500);
-    await instance.cast_envelope(envelops1, { from: accounts[2 + numberOfCandidates + 1] });
+    const envelop1 = await instance.compute_envelope(100, candidates[0], 500);
+    await instance.cast_envelope(envelop1, { from: accounts[2 + numberOfCandidates + 1] });
 
     // voter2, candidates[0]
-    const envelops2 = await instance.compute_envelope(200, candidates[0], 500);
-    await instance.cast_envelope(envelops2, { from: accounts[2 + numberOfCandidates + 2] });
+    const envelop2 = await instance.compute_envelope(200, candidates[0], 500);
+    await instance.cast_envelope(envelop2, { from: accounts[2 + numberOfCandidates + 2] });
    
     await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 500 });
     await instance.open_envelope(200, candidates[0], { from: accounts[2 + numberOfCandidates + 2], value: 500 });

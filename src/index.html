@@ -109,13 +109,6 @@
       </div>
     </div>
 
-
-
-
-
-
-
-
     <div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -129,7 +122,7 @@
             <form>
               <div class="form-group">
                 <label for="deposit-soul" class="col-form-label">Souls:</label>
-                <input type="number" min="0" oninput="validity.valid||(value='');"" class="form-control" id="deposit-soul">
+                <input type="number" min="0" oninput="validity.valid||(value='');" class="form-control" id="deposit-soul">
               </div>
             </form>
           </div>
@@ -141,14 +134,14 @@
       </div>
     </div>
 
-
-
-
+<!--
+  100, candidates[0], 500
+  #voter-sigil').val(), $('#candidate-address').val(), $('#voter-soul-->
     <div class="modal fade" id="voteModal" tabindex="-1" role="dialog" aria-labelledby="voteModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title" id="voteModalLabel">Vote</h4>
+            <h4 class="modal-title" id="voteModalLabel">Vote Candidate: <span id="vote-candidate-address"></span></h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -156,8 +149,12 @@
           <div class="modal-body">
             <form>
               <div class="form-group">
-                <label for="vote-soul" class="col-form-label">Souls:</label>
-                <input type="number" min="0" oninput="validity.valid||(value='');"" class="form-control" id="vote-soul">
+                <label for="voter-sigil" class="col-form-label">Sigil:</label>
+                <input type="text" min="0" class="form-control" id="voter-sigil">
+              </div>
+              <div class="form-group">
+                <label for="voter-soul" class="col-form-label">Souls:</label>
+                <input type="number" min="0" oninput="validity.valid||(value='');" class="form-control" id="voter-soul">
               </div>
             </form>
           </div>
@@ -168,20 +165,6 @@
         </div>
       </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

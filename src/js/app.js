@@ -101,12 +101,12 @@ App = {
                 candidateTemplate.find('.candidate-symbol').text(candidates[i]);
                 candidateTemplate.find('.candidate-deposit').text(result_get_candidate_soul.toString(10));
                 
-                candidateTemplate.find('.btn-vote').attr('data-id', candidates[i]);
+                candidateTemplate.find('.btn-vote-modal').attr('data-address', candidates[i]);
 
                 if (is_candidate && candidates[i] == App.account) {
-                    candidateTemplate.find('.btn-deposit').show().attr('data-id', candidates[i]);
+                    candidateTemplate.find('.btn-deposit-modal').show().attr('data-address', candidates[i]);
                 } else {
-                    candidateTemplate.find('.btn-deposit').hide();
+                    candidateTemplate.find('.btn-deposit-modal').hide();
                 }
 
                 candidatesRow.append(candidateTemplate.html());
@@ -114,12 +114,16 @@ App = {
             }
         });
     },
-
-    // Call a function from a smart contract
-    // The function send an event that triggers a transaction:: Metamask opens to confirm the transaction by the user
-    pressClick: function() {
+    voteClick: function() {
         App.contracts["Contract"].deployed().then(async(instance) =>{
-            await instance.pressClick({from: App.account});
+            //await instance.pressClick({from: App.account});
+        });
+    } ,
+    depositClick: function() {
+        App.contracts["Contract"].deployed().then(async(instance) =>{
+            //await instance.pressClick({from: App.account});
+            await instance.add_deposit.sendTransaction({from: App.account, value: $('#deposit-soul').val()});
+            App.render();
         });
     } 
 }
@@ -130,6 +134,15 @@ ethereum.on('accountsChanged', function (accounts) {
     App.account = account;
     App.render();
 });
+
+$('#depositModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var recipient = button.data('address') // Extract info from data-* attributes
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    modal.find('.modal-title').text('New deposit to ' + recipient)
+  })
 
 // Call init whenever the window loads
 $(function() {

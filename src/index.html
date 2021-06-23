@@ -82,13 +82,7 @@
                   </div>
               </div>
           </div>          
-    </div>
-
-
-
-
-
-
+      </div>
 
       <div id="candidatesRow" class="row">
         <!-- CANDIDATES LOAD HERE -->
@@ -107,13 +101,87 @@
             <strong>Symbol</strong>: <span class="candidate-symbol">0x0</span><br/>
             <strong>Deposit</strong>: <span class="candidate-deposit">0</span> souls<br/><br/>
             <div class="col-md-12 text-center">
-              <button class="btn btn-default btn-vote" type="button" data-id="0">Vote</button>
-              <button class="btn btn-default btn-deposit" type="button" data-id="0" style="display: none;">Deposit</button>
+              <button class="btn btn-default btn-vote-modal" data-toggle="modal" data-target="#voteModal" data-address="0x0" type="button">Vote</button>
+              <button class="btn btn-default btn-deposit-modal" data-toggle="modal" data-target="#depositModal" data-address="0x0" type="button" style="display: none;">Deposit</button>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+
+
+
+
+
+
+
+    <div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="depositModalLabel">New deposit</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="deposit-soul" class="col-form-label">Souls:</label>
+                <input type="number" min="0" oninput="validity.valid||(value='');"" class="form-control" id="deposit-soul">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="App.depositClick()">Deposit souls</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <div class="modal fade" id="voteModal" tabindex="-1" role="dialog" aria-labelledby="voteModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="voteModalLabel">Vote</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="vote-soul" class="col-form-label">Souls:</label>
+                <input type="number" min="0" oninput="validity.valid||(value='');"" class="form-control" id="vote-soul">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary ">Send vote</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

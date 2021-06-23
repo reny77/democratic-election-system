@@ -123,7 +123,7 @@ contract DemocraticMayor {
 
 
     function add_deposit() checkCandidate public payable {
-        candidates[msg.sender].personal_souls += msg.value;
+        candidates[msg.sender].personal_souls = msg.value;
         emit CandidateDeposit(msg.sender, candidates[msg.sender].personal_souls);
     }
 

@@ -1,68 +1,98 @@
 App = {
-  web3Provider: null,
-  contracts: {},
 
-  init: async function() {
-    // Load pets.
-    $.getJSON('../pets.json', function(data) {
-      var petsRow = $('#petsRow');
-      var petTemplate = $('#petTemplate');
+    contracts: {},
+    web3Provider: null,             // Web3 provider
+    url: 'http://0.0.0.0:8545',   // Url for web3
+    account: '0x0',                 // current ethereum account
 
-      for (i = 0; i < data.length; i ++) {
-        petTemplate.find('.panel-title').text(data[i].name);
-        petTemplate.find('img').attr('src', data[i].picture);
-        petTemplate.find('.pet-breed').text(data[i].breed);
-        petTemplate.find('.pet-age').text(data[i].age);
-        petTemplate.find('.pet-location').text(data[i].location);
-        petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
+    init: function() {
 
-        petsRow.append(petTemplate.html());
-      }
-    });
+        return App.initWeb3();
+    },
 
-    return await App.initWeb3();
-  },
+    /* initialize Web3 */
+    initWeb3: function() {
+        
+        // console.log(web3);
+        
+        if(typeof web3 != 'undefined') {
+//            App.web3Provider = web3.currentProvider;
+//            web3 = new Web3(web3.currentProvider);
+            App.web3Provider = window.ethereum; // !! new standard for modern eth browsers (2/11/18)
+            web3 = new Web3(App.web3Provider);
+            try {
+                    ethereum.enable().then(async() => {
+                        console.log("DApp connected to Metamask");
+                    });
+            }
+            catch(error) {
+                console.log(error);
+            }
+        } else {
+            App.web3Provider = new Web3.providers.HttpProvider(App.url); // <==
+            web3 = new Web3(App.web3Provider);
+        }
 
-  initWeb3: async function() {
-    /*
-     * Replace me...
-     */
+        return App.initContract();
+    },
 
-    return App.initContract();
-  },
+    /* Upload the contract's abstractions */
+    initContract: function() {
 
-  initContract: function() {
-    /*
-     * Replace me...
-     */
+        // Get current account
+        web3.eth.getCoinbase(function(err, account) {
+            if(err == null) {
+                App.account = account;
+                $("#accountId").html("Your address: " + account);
+            }
+        });
 
-    return App.bindEvents();
-  },
+        // Load content's abstractions
+        $.getJSON("DemocraticMayor.json").done(function(c) {        
+            App.contracts["Contract"] = TruffleContract(c);
+            App.contracts["Contract"].setProvider(App.web3Provider);
+            return App.listenForEvents();
+        });
+    },
 
-  bindEvents: function() {
-    $(document).on('click', '.btn-adopt', App.handleAdopt);
-  },
+    // Write an event listener
+    listenForEvents: function() {
+        return App.render();
+    },
 
-  markAdopted: function() {
-    /*
-     * Replace me...
-     */
-  },
+    // Get a value from the smart contract
+    render: function() {
+        var candidatesRow = $('#candidatesRow');
+        var candidateTemplate = $('#candidateTemplate');
+        App.contracts["Contract"].deployed().then(async (instance) => {
+            const candidates = await  instance.get_candidates();
+            for (let i = 0; i < candidates.length; i++) {
+                const result_get_candidate_soul = await instance.get_candidate_soul(candidates[i]);
 
-  handleAdopt: function(event) {
-    event.preventDefault();
+                candidateTemplate.find('img').attr('src', 'https://avatars.dicebear.com/api/human/' + candidates[i] + '.svg');
+                candidateTemplate.find('.panel-title').text('Candidate ' + i);
+                candidateTemplate.find('.candidate-symbol').text(candidates[i]);
+                candidateTemplate.find('.candidate-deposit').text(result_get_candidate_soul.toString(10));
+                candidateTemplate.find('.btn-adopt').attr('data-id', candidates[i]);
+        
+                candidatesRow.append(candidateTemplate.html());
+            }
+        });
+    },
 
-    var petId = parseInt($(event.target).data('id'));
+    // Call a function from a smart contract
+    // The function send an event that triggers a transaction:: Metamask opens to confirm the transaction by the user
+    pressClick: function() {
+        App.contracts["Contract"].deployed().then(async(instance) =>{
+            await instance.pressClick({from: App.account});
+        });
+    } 
+}
 
-    /*
-     * Replace me...
-     */
-  }
-
-};
-
+// Call init whenever the window loads
 $(function() {
-  $(window).load(function() {
-    App.init();
-  });
+    $(window).on('load', function () {
+
+        App.init();
+    });
 });

@@ -71,11 +71,12 @@ App = {
             const candidates = await  instance.get_candidates();
 
             //
-            const is_owner = await instance.is_owner({from: App.account});
+            var is_owner = await instance.is_owner({from: App.account});
+            var is_candidate = false;
             if (is_owner) {
                 $("#roleId").html("Owner");
             } else {
-                const is_candidate = await instance.is_candidate({from: App.account});
+                is_candidate = await instance.is_candidate({from: App.account});
                 if (is_candidate) {
                     $("#roleId").html("Candidate " + candidates.indexOf(App.account));
                 } else {
@@ -99,9 +100,17 @@ App = {
                 candidateTemplate.find('.panel-title').text('Candidate ' + i);
                 candidateTemplate.find('.candidate-symbol').text(candidates[i]);
                 candidateTemplate.find('.candidate-deposit').text(result_get_candidate_soul.toString(10));
-                candidateTemplate.find('.btn-adopt').attr('data-id', candidates[i]);
-        
+                
+                candidateTemplate.find('.btn-vote').attr('data-id', candidates[i]);
+
+                if (is_candidate && candidates[i] == App.account) {
+                    candidateTemplate.find('.btn-deposit').show().attr('data-id', candidates[i]);
+                } else {
+                    candidateTemplate.find('.btn-deposit').hide();
+                }
+
                 candidatesRow.append(candidateTemplate.html());
+                
             }
         });
     },

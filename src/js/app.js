@@ -11,9 +11,7 @@ App = {
 
     /* initialize Web3 */
     initWeb3: function() {
-        
-        // console.log(web3);
-        
+                
         if(typeof web3 != 'undefined') {
             App.web3Provider = window.ethereum;
             web3 = new Web3(App.web3Provider);
@@ -54,16 +52,6 @@ App = {
 
         App.contracts["Contract"].deployed().then(async (instance) => {
             // click is the Solidity event// If event has parameters: event.returnValues.valueName
-            instance.NewMayor(function(error, result) {
-                if (!error) {
-                    console.log(result.args._candidate);
-                }
-            });
-            instance.DrawMayor(function(error, result) {
-                if (!error) {
-                    console.log(result.args);
-                }
-            });
             instance.CandidateDeposit(function(error, result) {
                 if (!error) {
                     console.log(result.args);
@@ -79,7 +67,16 @@ App = {
                     console.log(result.args);
                 }
             });
-
+            instance.NewMayor(function(error, result) {
+                if (!error) {
+                    console.log(result.args._candidate);
+                }
+            });
+            instance.DrawMayor(function(error, result) {
+                if (!error) {
+                    console.log(result.args);
+                }
+            });
         });
 
         return App.render();
@@ -155,6 +152,14 @@ App = {
             }
         });
     },
+    depositClick: function() {
+        App.contracts["Contract"].deployed().then(async(instance) =>{
+            const result = await instance.add_deposit.sendTransaction({from: App.account, value: $('#deposit-soul').val()})
+            .then(function(receipt){
+                $('#depositModal').modal('hide');
+            });
+        });
+    },
     voteClick: function() {
         App.contracts["Contract"].deployed().then(async(instance) =>{
             const envelop = await instance.compute_envelope($('#voter-sigil').val(), $('#candidate-address').val(), $('#voter-soul').val());
@@ -164,14 +169,6 @@ App = {
             });
         });
     } ,
-    depositClick: function() {
-        App.contracts["Contract"].deployed().then(async(instance) =>{
-            const result = await instance.add_deposit.sendTransaction({from: App.account, value: $('#deposit-soul').val()})
-            .then(function(receipt){
-                $('#depositModal').modal('hide');
-            });
-        });
-    },
     openEvelopeClick: function() {
         App.contracts["Contract"].deployed().then(async(instance) =>{
             const result = await instance.open_envelope($('#openenvelop-sigil').val(), $('#openenvelop-symbol').val(), { from: App.account, value: $('#openenvelop-soul').val() })
@@ -209,11 +206,6 @@ $('#voteModal').on('show.bs.modal', function (event) {
     var modal = $(this)
     modal.find('#candidate-address').val(address);
     modal.find('#vote-intro').text('Vote for "' + name + '" at address' + address);
-});
-
-$('#checkResultModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget);
-    var modal = $(this);
 });
 
 // Call init whenever the window loads

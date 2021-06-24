@@ -27,6 +27,8 @@
           <h3 class="text-center">You are: <b><span id="roleId"></span></b></h3>
           <h4 class="text-center">with address:  <b><span id="accountId"></span></b></h4>
           <br/>
+          <button class="btn btn-default btn-mayor-or-sayonara center-block hide" data-toggle="modal" data-target="#checkResultModal" type="button">Check result</button>
+          <br/>
         </div>
       </div>
       
@@ -101,8 +103,8 @@
             <strong>Symbol</strong>: <span class="candidate-symbol">0x0</span><br/>
             <strong>Deposit</strong>: <span class="candidate-deposit">0</span> souls<br/><br/>
             <div class="col-md-12 text-center">
-              <button class="btn btn-default btn-vote-modal" data-toggle="modal" data-target="#voteModal" data-address="0x0" type="button">Vote</button>
-              <button class="btn btn-default btn-deposit-modal" data-toggle="modal" data-target="#depositModal" data-address="0x0" type="button" style="display: none;">Deposit</button>
+              <button class="btn btn-default btn-vote-modal" data-toggle="modal" data-target="#voteModal" data-address="0x0" data-name="" type="button">Vote</button>
+              <button class="btn btn-default btn-deposit-modal" data-toggle="modal" data-target="#depositModal" data-address="0x0" data-name="" type="button" style="display: none;">Deposit</button>
             </div>
           </div>
         </div>
@@ -141,13 +143,15 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title" id="voteModalLabel">Vote Candidate: <span id="vote-candidate-address"></span></h4>
+            <h4 class="modal-title">Insert vote</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
+            <span id="vote-intro"></span><br><br>
             <form>
+              <input type="hidden" id="candidate-address" value="">
               <div class="form-group">
                 <label for="voter-sigil" class="col-form-label">Sigil:</label>
                 <input type="text" min="0" class="form-control" id="voter-sigil">

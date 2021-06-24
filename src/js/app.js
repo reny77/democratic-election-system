@@ -70,12 +70,23 @@ App = {
         App.contracts["Contract"].deployed().then(async (instance) => {
             const candidates = await  instance.get_candidates();
 
+            // retrive vote conditions and status
+            const result_get_condition = await instance.get_condition();
+            const {0: cond_quorum, 1: cond_envelopes_casted, 2: cond_envelopes_opened} = result_get_condition;
+            $("#quorumId").html(cond_quorum.toString());
+            $("#envelopCastedId").html(cond_envelopes_casted.toString());
+            $("#envelopOpenedId").html(cond_envelopes_opened.toString());
+
             //
             var is_owner = await instance.is_owner({from: App.account});
             var is_candidate = false;
             if (is_owner) {
                 $("#roleId").html("Owner");
+                if (cond_quorum == cond_envelopes_opened) {
+                    $(".btn-mayor-or-sayonara").removeClass('hide'); // show check result button
+                }                
             } else {
+                $(".btn-mayor-or-sayonara").addClass('hide');
                 is_candidate = await instance.is_candidate({from: App.account});
                 if (is_candidate) {
                     $("#roleId").html("Candidate " + candidates.indexOf(App.account));
@@ -84,50 +95,58 @@ App = {
                 }
             }
 
-            // retrive vote conditions and status
-            const result_get_condition = await instance.get_condition();
-            const {0: cond_quorum, 1: cond_envelopes_casted, 2: cond_envelopes_opened} = result_get_condition;
-            $("#quorumId").html(cond_quorum.toString());
-            $("#envelopCastedId").html(cond_envelopes_casted.toString());
-            $("#envelopOpenedId").html(cond_envelopes_opened.toString());
-
             // empty candidates list
             candidatesRow.empty();
             for (let i = 0; i < candidates.length; i++) {
                 const result_get_candidate_soul = await instance.get_candidate_soul(candidates[i]);
 
+                const candidate_name = 'Candidate ' + i;
+
                 candidateTemplate.find('img').attr('src', 'https://avatars.dicebear.com/api/micah/' + candidates[i] + '.svg');
-                candidateTemplate.find('.panel-title').text('Candidate ' + i);
+                candidateTemplate.find('.panel-title').text(candidate_name);
                 candidateTemplate.find('.candidate-symbol').text(candidates[i]);
                 candidateTemplate.find('.candidate-deposit').text(result_get_candidate_soul.toString(10));
                 
                 candidateTemplate.find('.btn-vote-modal').attr('data-address', candidates[i]);
+                candidateTemplate.find('.btn-vote-modal').show().attr('data-name', candidate_name);
 
                 if (is_candidate && candidates[i] == App.account) {
                     candidateTemplate.find('.btn-deposit-modal').show().attr('data-address', candidates[i]);
+                    candidateTemplate.find('.btn-deposit-modal').show().attr('data-name', candidate_name);
                 } else {
                     candidateTemplate.find('.btn-deposit-modal').hide();
                 }
-
+                
+                
                 candidatesRow.append(candidateTemplate.html());
                 
             }
         });
     },
     voteClick: function() {
+        console.log($('#voter-sigil').val() + "-" + $('#candidate-address').val() + "-" + $('#voter-soul').val());
         App.contracts["Contract"].deployed().then(async(instance) =>{
             const envelop = await instance.compute_envelope($('#voter-sigil').val(), $('#candidate-address').val(), $('#voter-soul').val());
-            const result = await instance.cast_envelope(envelop, { from: App.account });
+            const result = await instance.cast_envelope.sendTransaction(envelop, { from: App.account })
+            .then(function(receipt){
+                $('#voteModal').modal('hide');
+            });
         });
     } ,
     depositClick: function() {
         App.contracts["Contract"].deployed().then(async(instance) =>{
             await instance.add_deposit.sendTransaction({from: App.account, value: $('#deposit-soul').val()})
             .then(function(receipt){
-                location.reload();
+                $('#depositModal').modal('hide');
             });
         });
-    } 
+    },
+    openeEvelopeClick: function() {
+        console.log("openeEvelopeClick");
+    },
+    mayorOrSayonaraClick: function() {
+        console.log("mayorOrSayonaraClick");;
+    }
 }
 
 // handle change account on MetaMask
@@ -138,21 +157,20 @@ ethereum.on('accountsChanged', function (accounts) {
 });
 
 $('#depositModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    var address = button.data('address') // Extract info from data-* attributes
-    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-    var modal = $(this)
-    modal.find('.modal-title').text('New deposit to ' + address)
+    var button = $(event.relatedTarget);
+    var address = button.data('address');
+    var name = button.data('name');
+    var modal = $(this);
+    modal.find('.modal-title').text('New deposit to "' + name + '" at address' + address);
 });
 
 $('#voteModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    var address = button.data('address') // Extract info from data-* attributes
-    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var button = $(event.relatedTarget);
+    var address = button.data('address');
+    var name = button.data('name');
     var modal = $(this)
-    modal.find('.modal-title').text('Vote: ' + address)
+    modal.find('#candidate-address').val(address);
+    modal.find('#vote-intro').text('Vote for "' + name + '" at address' + address);
 });
 
 // Call init whenever the window loads

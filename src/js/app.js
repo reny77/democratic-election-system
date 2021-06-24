@@ -6,7 +6,6 @@ App = {
     account: '0x0',                 // current ethereum account
 
     init: function() {
-
         return App.initWeb3();
     },
 
@@ -52,9 +51,39 @@ App = {
 
     // Write an event listener
     listenForEvents: function() {
+
+        App.contracts["Contract"].deployed().then(async (instance) => {
+            // click is the Solidity event// If event has parameters: event.returnValues.valueName
+            instance.NewMayor(function(error, result) {
+                if (!error) {
+                    console.log(result.args._candidate);
+                }
+            });
+            instance.DrawMayor(function(error, result) {
+                if (!error) {
+                    console.log(result.args);
+                }
+            });
+            instance.CandidateDeposit(function(error, result) {
+                if (!error) {
+                    console.log(result.args);
+                }
+            });
+            instance.EnvelopeCast(function(error, result) {
+                if (!error) {
+                    console.log(result.args);
+                }
+            });
+            instance.EnvelopeOpen(function(error, result) {
+                if (!error) {
+                    console.log(result.args);
+                }
+            });
+
+        });
+
         return App.render();
     },
-
     // Get a value from the smart contract
     render: function() {
         // Get current account
@@ -82,7 +111,7 @@ App = {
             var is_candidate = false;
             if (is_owner) {
                 $("#roleId").html("Owner");
-                if (cond_quorum == cond_envelopes_opened) {
+                if (cond_envelopes_casted.toString() == cond_envelopes_opened.toString()) {
                     $(".btn-mayor-or-sayonara").removeClass('hide'); // show check result button
                 }                
             } else {
@@ -94,7 +123,11 @@ App = {
                     $("#roleId").html("Citizen");
                 }
             }
-
+            if (cond_quorum.toString() == cond_envelopes_casted.toString() && cond_envelopes_casted.toString() != cond_envelopes_opened.toString()) {
+                $(".btn-open-envelop").removeClass('hide'); // show check result button
+            }
+            
+            
             // empty candidates list
             candidatesRow.empty();
             for (let i = 0; i < candidates.length; i++) {
@@ -117,35 +150,40 @@ App = {
                     candidateTemplate.find('.btn-deposit-modal').hide();
                 }
                 
-                
                 candidatesRow.append(candidateTemplate.html());
                 
             }
         });
     },
     voteClick: function() {
-        console.log($('#voter-sigil').val() + "-" + $('#candidate-address').val() + "-" + $('#voter-soul').val());
         App.contracts["Contract"].deployed().then(async(instance) =>{
             const envelop = await instance.compute_envelope($('#voter-sigil').val(), $('#candidate-address').val(), $('#voter-soul').val());
             const result = await instance.cast_envelope.sendTransaction(envelop, { from: App.account })
-            .then(function(receipt){
+            .then(function(receipt) {                
                 $('#voteModal').modal('hide');
             });
         });
     } ,
     depositClick: function() {
         App.contracts["Contract"].deployed().then(async(instance) =>{
-            await instance.add_deposit.sendTransaction({from: App.account, value: $('#deposit-soul').val()})
+            const result = await instance.add_deposit.sendTransaction({from: App.account, value: $('#deposit-soul').val()})
             .then(function(receipt){
                 $('#depositModal').modal('hide');
             });
         });
     },
-    openeEvelopeClick: function() {
-        console.log("openeEvelopeClick");
+    openEvelopeClick: function() {
+        App.contracts["Contract"].deployed().then(async(instance) =>{
+            const result = await instance.open_envelope($('#openenvelop-sigil').val(), $('#openenvelop-symbol').val(), { from: App.account, value: $('#openenvelop-soul').val() })
+            .then(function(receipt){
+                $('#openEnvelopModal').modal('hide');
+            });;
+        });
     },
-    mayorOrSayonaraClick: function() {
-        console.log("mayorOrSayonaraClick");;
+    mayorOrSayonaraClick: function() {        
+        App.contracts["Contract"].deployed().then(async(instance) =>{
+            const result = await instance.mayor_or_sayonara({ from: App.account}); 
+        });
     }
 }
 
@@ -171,6 +209,11 @@ $('#voteModal').on('show.bs.modal', function (event) {
     var modal = $(this)
     modal.find('#candidate-address').val(address);
     modal.find('#vote-intro').text('Vote for "' + name + '" at address' + address);
+});
+
+$('#checkResultModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var modal = $(this);
 });
 
 // Call init whenever the window loads

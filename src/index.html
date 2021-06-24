@@ -27,7 +27,8 @@
           <h3 class="text-center">You are: <b><span id="roleId"></span></b></h3>
           <h4 class="text-center">with address:  <b><span id="accountId"></span></b></h4>
           <br/>
-          <button class="btn btn-default btn-mayor-or-sayonara center-block hide" data-toggle="modal" data-target="#checkResultModal" type="button">Check result</button>
+          <button class="btn btn-default btn-mayor-or-sayonara center-block hide" onclick="App.mayorOrSayonaraClick()" data-toggle="modal" data-target="#checkResultModal" type="button">Check result</button>
+          <button class="btn btn-default btn-open-envelop center-block hide" data-toggle="modal" data-target="#openEnvelopModal" type="button">Open envelop</button>
           <br/>
         </div>
       </div>
@@ -136,9 +137,6 @@
       </div>
     </div>
 
-<!--
-  100, candidates[0], 500
-  #voter-sigil').val(), $('#candidate-address').val(), $('#voter-soul-->
     <div class="modal fade" id="voteModal" tabindex="-1" role="dialog" aria-labelledby="voteModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -154,7 +152,7 @@
               <input type="hidden" id="candidate-address" value="">
               <div class="form-group">
                 <label for="voter-sigil" class="col-form-label">Sigil:</label>
-                <input type="text" min="0" class="form-control" id="voter-sigil">
+                <input type="number" min="0" oninput="validity.valid||(value='');" class="form-control" id="voter-sigil">
               </div>
               <div class="form-group">
                 <label for="voter-soul" class="col-form-label">Souls:</label>
@@ -165,6 +163,41 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <button type="button" class="btn btn-primary" onclick="App.voteClick()">Send vote</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="openEnvelopModal" tabindex="-1" role="dialog" aria-labelledby="openEnvelopeModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Open envelop</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <span id="openEnvelope-intro">Insert your sigil, symbol of candidate that you voted and souls</span><br><br>
+            <form>
+              <input type="hidden" id="candidate-address" value="">
+              <div class="form-group">
+                <label for="openenvelop-sigil" class="col-form-label">Sigil:</label>
+                <input type="number" min="0" oninput="validity.valid||(value='');" class="form-control" id="openenvelop-sigil">
+              </div>
+              <div class="form-group">
+                <label for="openenvelop-symbol" class="col-form-label">Symbol:</label>
+                <input type="text" min="0" class="form-control" id="openenvelop-symbol">
+              </div>
+              <div class="form-group">
+                <label for="openenvelop-soul" class="col-form-label">Souls:</label>
+                <input type="number" min="0" oninput="validity.valid||(value='');" class="form-control" id="openenvelop-soul">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="App.openEvelopeClick()">Open envelop</button>
           </div>
         </div>
       </div>

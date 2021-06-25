@@ -187,7 +187,7 @@ contract DemocraticMayor {
     function mayor_or_sayonara() canCheckOutcome public {
         
         // The winner has now checked
-        //TODO: voting_condition.winner_checked = true;
+        voting_condition.winner_checked = true;
         
 
         // CHECK WINNER BY SOUL
@@ -226,15 +226,15 @@ contract DemocraticMayor {
                 }
             }
         }
-        //TODO: remove comments
+        
         if (winner_list_by_souls.length == 1) {
-            //pay_electors_and_winner(winner_list_by_souls[0]);
+            pay_electors_and_winner(winner_list_by_souls[0]);
             emit NewMayor(winner_list_by_souls[0]);
         } else if (winner_list_by_votes.length  == 1) {
-            //pay_electors_and_winner(winner_list_by_votes[0]);
+            pay_electors_and_winner(winner_list_by_votes[0]);
             emit NewMayor(winner_list_by_votes[0]);
         } else {
-            //no_winners();
+            no_winners();
             emit DrawMayor(winner_list_by_votes);
         }       
     }

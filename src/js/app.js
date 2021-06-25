@@ -148,8 +148,7 @@ App = {
                 $("#roleId").html("Owner");
 
                 // see results
-                //TODO: const is_winner_checked = await instance.is_winner_checked();
-                const is_winner_checked = true;
+                const is_winner_checked = await instance.is_winner_checked();
                 if (is_winner_checked) {
                     $(".btn-see-result").removeClass('hide');
                     $(".btn-mayor-or-sayonara").addClass('hide'); // hide check result button

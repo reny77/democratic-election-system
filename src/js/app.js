@@ -5,7 +5,7 @@ App = {
     url: 'http://0.0.0.0:8545',     // Url for web3
     account: '0x0',                 // current ethereum account
     latestblockNumber: 0,           // https://ethereum.stackexchange.com/questions/57803/solidity-event-logs
-
+    candidates: null,
     init: function() {
         return App.initWeb3();
     },
@@ -130,7 +130,7 @@ App = {
         candidatesRow.empty();
         var candidateTemplate = $('#candidateTemplate');
         App.contracts["Contract"].deployed().then(async (instance) => {
-            const candidates = await instance.get_candidates();
+            App.candidates = await instance.get_candidates();
 
             // retrive vote conditions and status, set display
             const result_get_condition = await instance.get_condition();
@@ -172,14 +172,14 @@ App = {
 
             const has_voted = await instance.check_has_voted(App.account);
             // render list of candidates
-            for (let i = 0; i < candidates.length; i++) {
-                const result_get_candidate_soul = await instance.get_candidate_soul(candidates[i]);
+            for (let i = 0; i < App.candidates.length; i++) {
+                const result_get_candidate_soul = await instance.get_candidate_soul(App.candidates[i]);
 
                 const candidate_name = 'Candidate ' + i;
 
-                candidateTemplate.find('img').attr('src', 'https://avatars.dicebear.com/api/micah/' + candidates[i] + '.svg');
+                candidateTemplate.find('img').attr('src', 'https://avatars.dicebear.com/api/micah/' + App.candidates[i] + '.svg');
                 candidateTemplate.find('.panel-title').text(candidate_name);
-                candidateTemplate.find('.candidate-symbol').text(candidates[i]);
+                candidateTemplate.find('.candidate-symbol').text(App.candidates[i]);
                 candidateTemplate.find('.candidate-deposit').text(result_get_candidate_soul.toString(10));
                                
                 // handle button under candidates
@@ -251,9 +251,22 @@ App = {
             const result = await instance.mayor_or_sayonara({ from: App.account}); 
         });
     },
-    seeResult: function() {        
+    seeResults: function() {        
         App.contracts["Contract"].deployed().then(async(instance) =>{
-            const result = await instance.mayor_or_sayonara({ from: App.account}); 
+            const results = await instance.get_result(); 
+            const {0: is_winner, 1: result_addresses, 2: cond_envelopes_opened} = results;
+            var message;
+            if (is_winner) {
+                message = "There is a winner!";
+            } else {
+                message = "There is a draw beetween: <br>";
+            }
+            
+            for (let i = 0; i < result_addresses.length; i++) {
+                message = message + "<br>Candidate " +  App.candidates.indexOf(result_addresses[i]) + " - " + result_addresses[i];
+            }
+            $('#resultsModalCenter').find(".modal-body").html(message);
+            $('#resultsModalCenter').modal('show');
         });
     },
 }

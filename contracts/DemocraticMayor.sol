@@ -318,6 +318,7 @@ contract DemocraticMayor {
         return voting_condition.winner_checked;
     }
 
+    /// @notice return results
     function get_result() public view returns(bool, address[] memory) {
         if (winner_list_by_souls.length == 1) {
             return (true, winner_list_by_souls);

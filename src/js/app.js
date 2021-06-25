@@ -159,6 +159,8 @@ App = {
                 }
             }
             
+            const has_voted = await instance.check_has_voted(App.account);
+
             // render list of candidates
             for (let i = 0; i < candidates.length; i++) {
                 const result_get_candidate_soul = await instance.get_candidate_soul(candidates[i]);
@@ -193,7 +195,7 @@ App = {
                 }
 
                 // open-envelop button
-                if (cond_quorum.toString() == cond_envelopes_casted.toString() && cond_envelopes_casted.toString() != cond_envelopes_opened.toString()) {
+                if (cond_quorum.toString() == cond_envelopes_casted.toString() && cond_envelopes_casted.toString() != cond_envelopes_opened.toString() && !has_voted) {
                     candidateTemplate.find('.btn-open-envelop')
                                         .attr('data-address', candidates[i])
                                         .removeClass("hide");
@@ -238,7 +240,12 @@ App = {
         App.contracts["Contract"].deployed().then(async(instance) =>{
             const result = await instance.mayor_or_sayonara({ from: App.account}); 
         });
-    }
+    },
+    seeResult: function() {        
+        App.contracts["Contract"].deployed().then(async(instance) =>{
+            const result = await instance.mayor_or_sayonara({ from: App.account}); 
+        });
+    },
 }
 
 // handle change account on MetaMask

@@ -59,7 +59,7 @@ contract DemocraticMayor {
     }
 
 
-
+    // Modifier for check is a candidate
     modifier checkCandidate() {
         require(candidates[msg.sender].symbol != address(0), "The sender is not a candidate");
         _;
@@ -121,7 +121,7 @@ contract DemocraticMayor {
                                     });
     }
 
-
+    /// @notice Add deposit from candidate
     function add_deposit() checkCandidate public payable {
         candidates[msg.sender].personal_souls = msg.value;
         emit CandidateDeposit(msg.sender, candidates[msg.sender].personal_souls);
@@ -141,7 +141,7 @@ contract DemocraticMayor {
 
 
 
-   /// @notice Open an envelope and store the vote information
+    /// @notice Open an envelope and store the vote information
     /// @param _sigil (uint) The secret sigil of a voter
     /// @param _symbol (address) The voting preference
     /// @dev The soul is sent as crypto
@@ -179,7 +179,7 @@ contract DemocraticMayor {
         emit EnvelopeOpen(msg.sender, msg.value, _symbol);
     }
 
-    /// @notice Either confirm or kick out the candidate. Refund the electors who voted for the losing outcome
+    /// @notice Check the winner
     function mayor_or_sayonara() canCheckOutcome public {
         
         // The winner has now checked
@@ -236,6 +236,8 @@ contract DemocraticMayor {
 
     }
    
+    /// @notice compute pay electors and winner
+    /// @param winner_symbol (address) The address of winner
     function pay_electors_and_winner(address winner_symbol) private  {
         // first: pay electors
         Candidate memory tmpCandidate = candidates[winner_symbol];
@@ -253,7 +255,8 @@ contract DemocraticMayor {
             }
         }   
     }
- 
+    
+    /// @notice compute no winner
     function no_winners() private returns (bool) {
         uint total_souls = 0;
         for (uint i = 0; i < candidates_list.length; i++) {  
@@ -275,27 +278,34 @@ contract DemocraticMayor {
         return keccak256(abi.encode(_sigil, _symbol, _soul));
     }
     
-    // some view functions for DAPP
+    /// @notice get candidates list
     function get_candidates() public view returns (address[] memory) {
         return candidates_list;
     }
 
+    /// @notice return candidate soul by address
+    /// @param _addr (address) The candidate address
     function get_candidate_soul(address _addr) public view returns (uint) {
         return candidates[_addr].personal_souls;
     }
 
+    /// @notice return get conditions and status of this election
     function get_condition() public view returns (uint32, uint32, uint32) {
         return (voting_condition.quorum, voting_condition.envelopes_casted, voting_condition.envelopes_opened);
     }
 
+    /// @notice check if an account, by address, has vote
+    /// @param _address (address) The account address
     function check_has_voted(address _address) public view returns(bool) {
         return souls[_address].symbol != address(0);
     }
 
+    /// @notice return if this current account is the owner
     function is_owner() public view returns(bool) {
         return msg.sender == election_master;
     }
 
+    /// @notice return if this current account is a candidate
     function is_candidate() public view returns(bool) {
         return candidates[msg.sender].symbol != address(0);
     }

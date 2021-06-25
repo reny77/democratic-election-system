@@ -4,6 +4,7 @@ App = {
     web3Provider: null,             // Web3 provider
     url: 'http://0.0.0.0:8545',     // Url for web3
     account: '0x0',                 // current ethereum account
+    latestblockNumber: 0,           // https://ethereum.stackexchange.com/questions/57803/solidity-event-logs
 
     init: function() {
         return App.initWeb3();
@@ -38,6 +39,14 @@ App = {
                 App.account = account;
             }
         });
+        // avoid load last event emeted 
+        // https://ethereum.stackexchange.com/questions/57803/solidity-event-logs
+        web3.eth.getBlockNumber(function (error, result) {
+            if (!error) {
+                latestblockNumber = result;
+                console.log("latestBlock=" + latestblockNumber);
+            }
+        });
 
         // Load content's abstractions
         $.getJSON("DemocraticMayor.json").done(function(c) {        
@@ -53,32 +62,52 @@ App = {
         App.contracts["Contract"].deployed().then(async (instance) => {
             // click is the Solidity event// If event has parameters: event.returnValues.valueName
             instance.CandidateDeposit(function(error, result) {
+                // https://ethereum.stackexchange.com/questions/57803/solidity-event-logs
                 if (!error) {
-                    console.log(result.args);
+                    if (result.blockNumber > latestblockNumber) {
+                        latestblockNumber = result.blockNumber;
+                        App.render();
+                    }
                 }
             });
             instance.EnvelopeCast(function(error, result) {
+                // https://ethereum.stackexchange.com/questions/57803/solidity-event-logs
                 if (!error) {
-                    console.log(result.args);
+                    if (result.blockNumber > latestblockNumber) {
+                        latestblockNumber = result.blockNumber;
+                        App.render();
+                    }
                 }
             });
             instance.EnvelopeOpen(function(error, result) {
+                // https://ethereum.stackexchange.com/questions/57803/solidity-event-logs
                 if (!error) {
-                    console.log(result.args);
+                    if (result.blockNumber > latestblockNumber) {
+                        latestblockNumber = result.blockNumber;
+                        App.render();
+                    }
                 }
             });
             instance.NewMayor(function(error, result) {
+                // https://ethereum.stackexchange.com/questions/57803/solidity-event-logs
                 if (!error) {
-                    console.log(result.args._candidate);
+                    if (result.blockNumber > latestblockNumber) {
+                        latestblockNumber = result.blockNumber;
+                        App.render();
+                    }
                 }
             });
             instance.DrawMayor(function(error, result) {
+                // https://ethereum.stackexchange.com/questions/57803/solidity-event-logs
                 if (!error) {
-                    console.log(result.args);
+                    if (result.blockNumber > latestblockNumber) {
+                        latestblockNumber = result.blockNumber;
+                        App.render();
+                    }
                 }
             });
         });
-
+        console.log("listener installed");
         return App.render();
     },
     // Get a value from the smart contract
@@ -92,6 +121,8 @@ App = {
         });
 
         var candidatesRow = $('#candidatesRow');
+        // empty candidates list
+        candidatesRow.empty();
         var candidateTemplate = $('#candidateTemplate');
         App.contracts["Contract"].deployed().then(async (instance) => {
             const candidates = await  instance.get_candidates();
@@ -124,9 +155,6 @@ App = {
                 $(".btn-open-envelop").removeClass('hide'); // show check result button
             }
             
-            
-            // empty candidates list
-            candidatesRow.empty();
             for (let i = 0; i < candidates.length; i++) {
                 const result_get_candidate_soul = await instance.get_candidate_soul(candidates[i]);
 
@@ -155,7 +183,7 @@ App = {
     depositClick: function() {
         App.contracts["Contract"].deployed().then(async(instance) =>{
             const result = await instance.add_deposit.sendTransaction({from: App.account, value: $('#deposit-soul').val()})
-            .then(function(receipt){
+            .then(function(receipt) {
                 $('#depositModal').modal('hide');
             });
         });

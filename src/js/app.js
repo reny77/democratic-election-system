@@ -164,7 +164,7 @@ App = {
                 $(".btn-mayor-or-sayonara").addClass('hide');  // hide check result button
                 is_candidate = await instance.is_candidate({from: App.account});
                 if (is_candidate) {
-                    $("#roleId").html("Candidate " + candidates.indexOf(App.account));
+                    $("#roleId").html("Candidate " + App.candidates.indexOf(App.account));
                 } else {
                     $("#roleId").html("Citizen");
                 }
@@ -185,9 +185,9 @@ App = {
                 // handle button under candidates
                 
                 // deposit button
-                if (is_candidate && candidates[i] == App.account && result_get_candidate_soul == 0) {
+                if (is_candidate && App.candidates[i] == App.account && result_get_candidate_soul == 0) {
                     candidateTemplate.find('.btn-deposit-modal')
-                                        .attr('data-address', candidates[i])
+                                        .attr('data-address', App.candidates[i])
                                         .attr('data-name', candidate_name)
                                         .removeClass("hide");
                 } else {
@@ -197,7 +197,7 @@ App = {
                 // vote button
                 if (cond_quorum.toString() != cond_envelopes_casted.toString()) {
                     candidateTemplate.find('.btn-vote-modal')
-                                        .attr('data-address', candidates[i])
+                                        .attr('data-address', App.candidates[i])
                                         .attr('data-name', candidate_name)
                                         .removeClass("hide");
                 } else {
@@ -207,7 +207,7 @@ App = {
                 // open-envelop button
                 if (cond_quorum.toString() == cond_envelopes_casted.toString() && cond_envelopes_casted.toString() != cond_envelopes_opened.toString() && !has_voted) {
                     candidateTemplate.find('.btn-open-envelop')
-                                        .attr('data-address', candidates[i])
+                                        .attr('data-address', App.candidates[i])
                                         .removeClass("hide");
                 } else {
                     $(".btn-open-envelop").addClass('hide');

@@ -94,9 +94,9 @@ contract DemocraticMayor {
     /// @param _quorum (address) The number of voters required to finalize the confirmation
     constructor(address[] memory _candidates, address payable _escrow, uint32 _quorum) {          
         // check minimum number of candidates
-        require(_candidates.length > 1, "The number of candidates must be at least 2");
+        require(_candidates.length > 2, "The number of candidates must be at least 3");
         // check minimum quorum
-        require(_quorum > 1, "The minimum quorum must be at least 2");
+        require(_quorum > 2, "The minimum quorum must be at least 3");
 
         // set address of deployer (the election_master)
         election_master = msg.sender;

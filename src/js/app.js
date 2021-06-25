@@ -44,7 +44,6 @@ App = {
         web3.eth.getBlockNumber(function (error, result) {
             if (!error) {
                 latestblockNumber = result;
-                console.log("latestBlock=" + latestblockNumber);
             }
         });
 
@@ -67,6 +66,7 @@ App = {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
                         App.render();
+                        $('#infoModalCenter').modal('hide');
                     }
                 }
             });
@@ -76,6 +76,7 @@ App = {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
                         App.render();
+                        $('#infoModalCenter').modal('hide');
                     }
                 }
             });
@@ -85,6 +86,7 @@ App = {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
                         App.render();
+                        $('#infoModalCenter').modal('hide');
                     }
                 }
             });
@@ -94,6 +96,7 @@ App = {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
                         App.render();
+                        $('#infoModalCenter').modal('hide');
                     }
                 }
             });
@@ -103,11 +106,11 @@ App = {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
                         App.render();
+                        $('#infoModalCenter').modal('hide');
                     }
                 }
             });
         });
-        console.log("listener installed");
         return App.render();
     },
     // Get a value from the smart contract
@@ -185,6 +188,7 @@ App = {
             const result = await instance.add_deposit.sendTransaction({from: App.account, value: $('#deposit-soul').val()})
             .then(function(receipt) {
                 $('#depositModal').modal('hide');
+                $('#infoModalCenter').modal('show');
             });
         });
     },
@@ -194,6 +198,7 @@ App = {
             const result = await instance.cast_envelope.sendTransaction(envelop, { from: App.account })
             .then(function(receipt) {                
                 $('#voteModal').modal('hide');
+                $('#infoModalCenter').modal('show');
             });
         });
     } ,
@@ -202,6 +207,7 @@ App = {
             const result = await instance.open_envelope($('#openenvelop-sigil').val(), $('#openenvelop-symbol').val(), { from: App.account, value: $('#openenvelop-soul').val() })
             .then(function(receipt){
                 $('#openEnvelopModal').modal('hide');
+                $('#infoModalCenter').modal('show');
             });;
         });
     },

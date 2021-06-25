@@ -187,7 +187,7 @@ contract DemocraticMayor {
     function mayor_or_sayonara() canCheckOutcome public {
         
         // The winner has now checked
-        voting_condition.winner_checked = true;
+        //TODO: voting_condition.winner_checked = true;
         
 
         // CHECK WINNER BY SOUL

@@ -94,9 +94,9 @@ contract DemocraticMayor {
     /// @param _quorum (address) The number of voters required to finalize the confirmation
     constructor(address[] memory _candidates, address payable _escrow, uint32 _quorum) {          
         // check minimum number of candidates
-        require(_candidates.length > 2, "The number of candidates must be at least 3");
+        require(_candidates.length > 1, "The number of candidates must be at least 2");
         // check minimum quorum
-        require(_quorum > 2, "The minimum quorum must be at least 3");
+        require(_quorum > 1, "The minimum quorum must be at least 2");
 
         // set address of deployer (the election_master)
         election_master = msg.sender;
@@ -228,13 +228,13 @@ contract DemocraticMayor {
         }
 
         if (winner_list_by_souls.length == 1) {
-            pay_electors_and_winner(winner_list_by_souls[0]);
+            //pay_electors_and_winner(winner_list_by_souls[0]);
             emit NewMayor(winner_list_by_souls[0]);
         } else if (winner_list_by_votes.length  == 1) {
-            pay_electors_and_winner(winner_list_by_votes[0]);
+            //pay_electors_and_winner(winner_list_by_votes[0]);
             emit NewMayor(winner_list_by_votes[0]);
         } else {
-            no_winners();
+            //no_winners();
             emit DrawMayor(winner_list_by_votes);
         }       
 

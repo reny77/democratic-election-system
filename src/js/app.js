@@ -95,8 +95,9 @@ App = {
                 if (!error) {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
-                        App.render();
-                        $('#infoModalCenter').modal('hide');
+                        /*App.render();
+                        $('#infoModalCenter').modal('hide');*/
+                        console.log("NewMayor=" + result.args._candidate);
                     }
                 }
             });
@@ -105,8 +106,9 @@ App = {
                 if (!error) {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
-                        App.render();
-                        $('#infoModalCenter').modal('hide');
+                       /*App.render();
+                        $('#infoModalCenter').modal('hide');*/
+                        console.log("DrawMayor=" + result);
                     }
                 }
             });
@@ -144,9 +146,11 @@ App = {
                 $("#roleId").html("Owner");
                 if (cond_envelopes_casted.toString() == cond_envelopes_opened.toString()) {
                     $(".btn-mayor-or-sayonara").removeClass('hide'); // show check result button
+                } else {
+                    $(".btn-mayor-or-sayonara").addClass('hide'); // hide check result button
                 }                
             } else {
-                $(".btn-mayor-or-sayonara").addClass('hide');
+                $(".btn-mayor-or-sayonara").addClass('hide');  // hide check result button
                 is_candidate = await instance.is_candidate({from: App.account});
                 if (is_candidate) {
                     $("#roleId").html("Candidate " + candidates.indexOf(App.account));
@@ -154,9 +158,22 @@ App = {
                     $("#roleId").html("Citizen");
                 }
             }
+
+            // manage open-envelop button
             if (cond_quorum.toString() == cond_envelopes_casted.toString() && cond_envelopes_casted.toString() != cond_envelopes_opened.toString()) {
-                $(".btn-open-envelop").removeClass('hide'); // show check result button
+                $(".btn-open-envelop").removeClass('hide'); // show open envelop
+            } else {
+                $(".btn-open-envelop").addClass('hide'); // hide open envelop
             }
+
+            // TODO: manage deposit and vote button
+            /*if (cond_quorum.toString() == cond_envelopes_casted.toString()) {
+                $(".btn-vote-modal").removeClass('hide'); // show btn-vote-modal
+                $(".btn-deposit-modal").removeClass('hide'); // show open envelop
+            } else {
+                $(".btn-vote-modal").addClass('hide'); // hide btn-vote-modal
+                $(".btn-deposit-modal").addClass('hide'); // hide open envelop
+            }*/
             
             for (let i = 0; i < candidates.length; i++) {
                 const result_get_candidate_soul = await instance.get_candidate_soul(candidates[i]);
@@ -172,7 +189,7 @@ App = {
                 candidateTemplate.find('.btn-vote-modal').show().attr('data-name', candidate_name);
 
                 if (is_candidate && candidates[i] == App.account) {
-                    candidateTemplate.find('.btn-deposit-modal').show().attr('data-address', candidates[i]);
+                    candidateTemplate.find('.btn-deposit-modal').attr('data-address', candidates[i]);
                     candidateTemplate.find('.btn-deposit-modal').show().attr('data-name', candidate_name);
                 } else {
                     candidateTemplate.find('.btn-deposit-modal').hide();

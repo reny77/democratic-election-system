@@ -142,14 +142,24 @@ App = {
             // handle type of user connected in Metamask
             var is_owner = await instance.is_owner({from: App.account});
 
+
             var is_candidate = false;
             if (is_owner) {
                 $("#roleId").html("Owner");
-                if (cond_envelopes_casted.toString() == cond_envelopes_opened.toString()) {
-                    $(".btn-mayor-or-sayonara").removeClass('hide'); // show check result button
-                } else {
+
+                // see results
+                //TODO: const is_winner_checked = await instance.is_winner_checked();
+                const is_winner_checked = true;
+                if (is_winner_checked) {
+                    $(".btn-see-result").removeClass('hide');
                     $(".btn-mayor-or-sayonara").addClass('hide'); // hide check result button
-                }                
+                } else if (cond_envelopes_casted.toString() == cond_envelopes_opened.toString()) {
+                    $(".btn-mayor-or-sayonara").removeClass('hide'); // show check result button
+                }
+                /* else {
+                    $(".btn-mayor-or-sayonara").addClass('hide'); // hide check result button
+                }  */   
+
             } else {
                 $(".btn-mayor-or-sayonara").addClass('hide');  // hide check result button
                 is_candidate = await instance.is_candidate({from: App.account});
@@ -158,12 +168,6 @@ App = {
                 } else {
                     $("#roleId").html("Citizen");
                 }
-            }
-
-            // see results
-            const is_winner_checked = instance.is_winner_checked();
-            if (is_winner_checked) {
-                $(".btn-see-result").removeClass('hide');
             }
 
             const has_voted = await instance.check_has_voted(App.account);

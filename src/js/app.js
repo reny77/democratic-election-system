@@ -95,8 +95,8 @@ App = {
                 if (!error) {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
-                        /*App.render();
-                        $('#infoModalCenter').modal('hide');*/
+                        App.render();
+                        //$('#infoModalCenter').modal('hide');
                         console.log("NewMayor=" + result.args._candidate);
                     }
                 }
@@ -106,9 +106,9 @@ App = {
                 if (!error) {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
-                       /*App.render();
-                        $('#infoModalCenter').modal('hide');*/
-                        console.log("DrawMayor=" + result);
+                        App.render();
+                        $('#infoModalCenter').modal('hide');
+                        console.log("DrawMayor=" + result.args._candidates);
                     }
                 }
             });
@@ -132,14 +132,14 @@ App = {
         App.contracts["Contract"].deployed().then(async (instance) => {
             const candidates = await  instance.get_candidates();
 
-            // retrive vote conditions and status
+            // retrive vote conditions and status, set display
             const result_get_condition = await instance.get_condition();
             const {0: cond_quorum, 1: cond_envelopes_casted, 2: cond_envelopes_opened} = result_get_condition;
             $("#quorumId").html(cond_quorum.toString());
             $("#envelopCastedId").html(cond_envelopes_casted.toString());
             $("#envelopOpenedId").html(cond_envelopes_opened.toString());
 
-            //
+            // handle type of user connected in Metamask
             var is_owner = await instance.is_owner({from: App.account});
             var is_candidate = false;
             if (is_owner) {
@@ -158,23 +158,8 @@ App = {
                     $("#roleId").html("Citizen");
                 }
             }
-
-            // manage open-envelop button
-            if (cond_quorum.toString() == cond_envelopes_casted.toString() && cond_envelopes_casted.toString() != cond_envelopes_opened.toString()) {
-                $(".btn-open-envelop").removeClass('hide'); // show open envelop
-            } else {
-                $(".btn-open-envelop").addClass('hide'); // hide open envelop
-            }
-
-            // TODO: manage deposit and vote button
-            /*if (cond_quorum.toString() == cond_envelopes_casted.toString()) {
-                $(".btn-vote-modal").removeClass('hide'); // show btn-vote-modal
-                $(".btn-deposit-modal").removeClass('hide'); // show open envelop
-            } else {
-                $(".btn-vote-modal").addClass('hide'); // hide btn-vote-modal
-                $(".btn-deposit-modal").addClass('hide'); // hide open envelop
-            }*/
             
+            // render list of candidates
             for (let i = 0; i < candidates.length; i++) {
                 const result_get_candidate_soul = await instance.get_candidate_soul(candidates[i]);
 
@@ -184,15 +169,36 @@ App = {
                 candidateTemplate.find('.panel-title').text(candidate_name);
                 candidateTemplate.find('.candidate-symbol').text(candidates[i]);
                 candidateTemplate.find('.candidate-deposit').text(result_get_candidate_soul.toString(10));
+                               
+                // handle button under candidates
                 
-                candidateTemplate.find('.btn-vote-modal').attr('data-address', candidates[i]);
-                candidateTemplate.find('.btn-vote-modal').show().attr('data-name', candidate_name);
-
-                if (is_candidate && candidates[i] == App.account) {
-                    candidateTemplate.find('.btn-deposit-modal').attr('data-address', candidates[i]);
-                    candidateTemplate.find('.btn-deposit-modal').show().attr('data-name', candidate_name);
+                // deposit button
+                if (is_candidate && candidates[i] == App.account && result_get_candidate_soul == 0) {
+                    candidateTemplate.find('.btn-deposit-modal')
+                                        .attr('data-address', candidates[i])
+                                        .attr('data-name', candidate_name)
+                                        .removeClass("hide");
                 } else {
-                    candidateTemplate.find('.btn-deposit-modal').hide();
+                    candidateTemplate.find('.btn-deposit-modal').addClass("hide");
+                }
+
+                // vote button
+                if (cond_quorum.toString() != cond_envelopes_casted.toString()) {
+                    candidateTemplate.find('.btn-vote-modal')
+                                        .attr('data-address', candidates[i])
+                                        .attr('data-name', candidate_name)
+                                        .removeClass("hide");
+                } else {
+                    candidateTemplate.find('.btn-vote-modal').addClass("hide");
+                }
+
+                // open-envelop button
+                if (cond_quorum.toString() == cond_envelopes_casted.toString() && cond_envelopes_casted.toString() != cond_envelopes_opened.toString()) {
+                    candidateTemplate.find('.btn-open-envelop')
+                                        .attr('data-address', candidates[i])
+                                        .removeClass("hide");
+                } else {
+                    $(".btn-open-envelop").addClass('hide');
                 }
                 
                 candidatesRow.append(candidateTemplate.html());
@@ -256,6 +262,14 @@ $('#voteModal').on('show.bs.modal', function (event) {
     var name = button.data('name');
     var modal = $(this)
     modal.find('#candidate-address').val(address);
+    modal.find('#vote-intro').text('Vote for "' + name + '" at address' + address);
+});
+
+$('#openEnvelopModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var address = button.data('address');
+    var modal = $(this)
+    modal.find('#openenvelop-symbol').val(address);
     modal.find('#vote-intro').text('Vote for "' + name + '" at address' + address);
 });
 

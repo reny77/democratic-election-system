@@ -27,8 +27,8 @@
           <h3 class="text-center">You are: <b><span id="roleId"></span></b></h3>
           <h4 class="text-center">with address:  <b><span id="accountId"></span></b></h4>
           <br/>
-          <button class="btn btn-default btn-mayor-or-sayonara center-block hide" onclick="App.mayorOrSayonaraClick()" data-toggle="modal" data-target="#checkResultModal" type="button">Check result</button>
-          <button class="btn btn-default btn-open-envelop center-block hide" data-toggle="modal" data-target="#openEnvelopModal" type="button">Open envelop</button>
+          <button class="btn btn-default btn-mayor-or-sayonara center-block hide" onclick="App.mayorOrSayonaraClick()" data-toggle="modal" data-target="#checkResultModal" type="button">Compute winnner</button>
+          <button class="btn btn-default btn-see-result center-block hide" onclick="App.seeResault()" data-toggle="modal" data-target="#seeResultModal" type="button">See result</button>
           <br/>
         </div>
       </div>
@@ -104,8 +104,9 @@
             <strong>Symbol</strong>: <span class="candidate-symbol">0x0</span><br/>
             <strong>Deposit</strong>: <span class="candidate-deposit">0</span> souls<br/><br/>
             <div class="col-md-12 text-center">
-              <button class="btn btn-default btn-vote-modal" data-toggle="modal" data-target="#voteModal" data-address="0x0" data-name="" type="button">Vote</button>
-              <button class="btn btn-default btn-deposit-modal" data-toggle="modal" data-target="#depositModal" data-address="0x0" data-name="" type="button" style="display: none;">Deposit</button>
+              <button class="btn btn-default btn-open-envelop hide" data-toggle="modal" data-target="#openEnvelopModal" data-address="0x0" type="button">Open envelop</button>
+              <button class="btn btn-default btn-vote-modal hide" data-toggle="modal" data-target="#voteModal" data-address="0x0" data-name="" type="button">Vote</button>
+              <button class="btn btn-default btn-deposit-modal hide" data-toggle="modal" data-target="#depositModal" data-address="0x0" data-name="" type="button">Deposit</button>
             </div>
           </div>
         </div>
@@ -178,16 +179,15 @@
             </button>
           </div>
           <div class="modal-body">
-            <span id="openEnvelope-intro">Insert your sigil, symbol of candidate that you voted and souls</span><br><br>
+            <span id="openEnvelope-intro">Insert your sigil and souls for this symbol and try to open envelop!</span><br><br>
             <form>
-              <input type="hidden" id="candidate-address" value="">
+              <div class="form-group">
+                <label for="openenvelop-symbol" class="col-form-label">Symbol:</label>
+                <input type="text" min="0" class="form-control" id="openenvelop-symbol" readonly>
+              </div>
               <div class="form-group">
                 <label for="openenvelop-sigil" class="col-form-label">Sigil:</label>
                 <input type="number" min="0" oninput="validity.valid||(value='');" class="form-control" id="openenvelop-sigil">
-              </div>
-              <div class="form-group">
-                <label for="openenvelop-symbol" class="col-form-label">Symbol:</label>
-                <input type="text" min="0" class="form-control" id="openenvelop-symbol">
               </div>
               <div class="form-group">
                 <label for="openenvelop-soul" class="col-form-label">Souls:</label>

@@ -226,7 +226,7 @@ contract DemocraticMayor {
                 }
             }
         }
-
+        //TODO: remove comments
         if (winner_list_by_souls.length == 1) {
             //pay_electors_and_winner(winner_list_by_souls[0]);
             emit NewMayor(winner_list_by_souls[0]);
@@ -237,7 +237,6 @@ contract DemocraticMayor {
             //no_winners();
             emit DrawMayor(winner_list_by_votes);
         }       
-
     }
    
     /// @notice compute pay electors and winner
@@ -314,5 +313,19 @@ contract DemocraticMayor {
         return candidates[msg.sender].symbol != address(0);
     }
 
+    /// @notice return if winner was checked
+    function is_winner_checked() public view returns(bool) {
+        return voting_condition.winner_checked;
+    }
+
+    function get_result() public view returns(bool, address[] memory) {
+        if (winner_list_by_souls.length == 1) {
+            return (true, winner_list_by_souls);
+        } else if (winner_list_by_votes.length  == 1) {
+            return (true, winner_list_by_votes);
+        } else {
+            return (false, winner_list_by_votes);
+        }  
+    }
 
 }

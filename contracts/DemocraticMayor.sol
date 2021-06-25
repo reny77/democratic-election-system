@@ -315,7 +315,7 @@ contract DemocraticMayor {
 
     /// @notice return if winner was checked
     function is_winner_checked() public view returns(bool) {
-        return voting_condition.winner_checked;
+        return voting_condition.winner_checked == true;
     }
 
     /// @notice return results (there is a winner, address of winners)

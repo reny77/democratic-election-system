@@ -130,7 +130,7 @@ App = {
         candidatesRow.empty();
         var candidateTemplate = $('#candidateTemplate');
         App.contracts["Contract"].deployed().then(async (instance) => {
-            const candidates = await  instance.get_candidates();
+            const candidates = await instance.get_candidates();
 
             // retrive vote conditions and status, set display
             const result_get_condition = await instance.get_condition();
@@ -141,6 +141,7 @@ App = {
 
             // handle type of user connected in Metamask
             var is_owner = await instance.is_owner({from: App.account});
+
             var is_candidate = false;
             if (is_owner) {
                 $("#roleId").html("Owner");
@@ -158,9 +159,14 @@ App = {
                     $("#roleId").html("Citizen");
                 }
             }
-            
-            const has_voted = await instance.check_has_voted(App.account);
 
+            // see results
+            const is_winner_checked = instance.is_winner_checked();
+            if (is_winner_checked) {
+                $(".btn-see-result").removeClass('hide');
+            }
+
+            const has_voted = await instance.check_has_voted(App.account);
             // render list of candidates
             for (let i = 0; i < candidates.length; i++) {
                 const result_get_candidate_soul = await instance.get_candidate_soul(candidates[i]);

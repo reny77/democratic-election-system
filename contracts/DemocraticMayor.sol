@@ -3,7 +3,8 @@ pragma solidity 0.8.1;
 
 contract DemocraticMayor {
 
-     address election_master;
+    // the address of contract deployer
+    address election_master;
 
     // Structs, events, and modifiers    
     // Store refund data
@@ -92,7 +93,10 @@ contract DemocraticMayor {
     /// @param _escrow (address) The address of the escrow account
     /// @param _quorum (address) The number of voters required to finalize the confirmation
     constructor(address[] memory _candidates, address payable _escrow, uint32 _quorum) {          
-        // TODO: check minum number of candidate???
+        // check minimum number of candidates
+        require(_candidates.length > 2, "The number of candidates must be at least 3");
+        // check minimum quorum
+        require(_quorum > 2, "The minimum quorum must be at least 3");
 
         // set address of deployer (the election_master)
         election_master = msg.sender;

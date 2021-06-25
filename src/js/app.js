@@ -152,12 +152,11 @@ App = {
                 if (is_winner_checked) {
                     $(".btn-see-result").removeClass('hide');
                     $(".btn-mayor-or-sayonara").addClass('hide'); // hide check result button
-                } else if (cond_envelopes_casted.toString() == cond_envelopes_opened.toString()) {
+                } else if (cond_envelopes_casted.toString() != 0 && cond_envelopes_casted.toString() == cond_envelopes_opened.toString()) {
                     $(".btn-mayor-or-sayonara").removeClass('hide'); // show check result button
-                }
-                /* else {
+                } else {
                     $(".btn-mayor-or-sayonara").addClass('hide'); // hide check result button
-                }  */   
+                } 
 
             } else {
                 $(".btn-mayor-or-sayonara").addClass('hide');  // hide check result button

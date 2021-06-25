@@ -3,11 +3,9 @@ const DemocraticMayor = artifacts.require("DemocraticMayor");
 module.exports = function(deployer, network, accounts) {
 
     console.log("------------------------------ deployer ------------------------------");
-    /*let quorum = 5;
-    let numberOfCandidates = 5;*/
 
-    let quorum = 2;
-    let numberOfCandidates = 2;
+    let quorum = 3;
+    let numberOfCandidates = 5;
 
     let escrow = accounts[1];
 

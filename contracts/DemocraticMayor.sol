@@ -256,6 +256,12 @@ contract DemocraticMayor {
                 payable(winner_symbol).transfer(tmpLooser.personal_souls);
             }
         }   
+        // third: refund loosers
+        for (uint i = 0; i < voters.length; i++) {          
+            if (souls[payable(voters[i])].symbol != winner_symbol) {                     
+                payable(voters[i]).transfer(souls[payable(voters[i])].soul);  // returns soul to users
+            }
+        }
     }
     
     /// @notice compute no winner

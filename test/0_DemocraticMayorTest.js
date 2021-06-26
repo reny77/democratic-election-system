@@ -189,7 +189,7 @@ contract("Testing DemocraticMayor", accounts => {
 
 
   it("Test call mayor_or_sayonara two time", async function() {
-    let quorum = 2; // test quorum
+    let quorum = 3; // test quorum
 
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
    
@@ -199,9 +199,13 @@ contract("Testing DemocraticMayor", accounts => {
     // voter2, candidates[0]
     const envelop2 = await instance.compute_envelope(200, candidates[0], 500);
     await instance.cast_envelope(envelop2, { from: accounts[2 + numberOfCandidates + 2] });
+    // voter3, candidates[0]
+    const envelop3 = await instance.compute_envelope(300, candidates[0], 500);
+    await instance.cast_envelope(envelop3, { from: accounts[2 + numberOfCandidates + 3] });
    
     await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 500 });
     await instance.open_envelope(200, candidates[0], { from: accounts[2 + numberOfCandidates + 2], value: 500 });
+    await instance.open_envelope(300, candidates[0], { from: accounts[2 + numberOfCandidates + 3], value: 500 });
 
     const result = await instance.mayor_or_sayonara();
     truffleAssert.eventEmitted(result, 'NewMayor', (ev) => {
@@ -211,7 +215,7 @@ contract("Testing DemocraticMayor", accounts => {
   });
 
   it("Test view functions", async function() {
-    let quorum = 2; // test quorum
+    let quorum = 3; // test quorum
     let test_soul = 1000000000000;
 
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
@@ -229,9 +233,14 @@ contract("Testing DemocraticMayor", accounts => {
     // voter2, candidates[0]
     const envelop2 = await instance.compute_envelope(200, candidates[0], 500);
     await instance.cast_envelope(envelop2, { from: accounts[2 + numberOfCandidates + 2] });
+
+    // voter3, candidates[0]
+    const envelop3 = await instance.compute_envelope(300, candidates[0], 500);
+    await instance.cast_envelope(envelop3, { from: accounts[2 + numberOfCandidates + 3] });
    
     await instance.open_envelope(100, candidates[0], { from: accounts[2 + numberOfCandidates + 1], value: 500 });
     await instance.open_envelope(200, candidates[0], { from: accounts[2 + numberOfCandidates + 2], value: 500 });
+    await instance.open_envelope(300, candidates[0], { from: accounts[2 + numberOfCandidates + 3], value: 500 });
 
     const result_check_has_voted_true = await instance.check_has_voted(accounts[2 + numberOfCandidates + 1]);
     assert(result_check_has_voted_true, "The account has voted, but instead it seems not");
@@ -248,8 +257,8 @@ contract("Testing DemocraticMayor", accounts => {
     const {0: cond_quorum, 1: cond_envelopes_casted, 2: cond_envelopes_opened} = result_get_condition;
 
     assert(cond_quorum == quorum, "The quorum condition is not recognize");
-    assert(cond_envelopes_casted == 2, "The envelopes casted are not recognize");
-    assert(cond_envelopes_opened == 2, "The envelopes opened are not recognize");
+    assert(cond_envelopes_casted == 3, "The envelopes casted are not recognize");
+    assert(cond_envelopes_opened == 3, "The envelopes opened are not recognize");
 
 
     const result_is_owner = await instance.is_owner({from: accounts[0]});

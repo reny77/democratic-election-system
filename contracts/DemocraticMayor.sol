@@ -46,6 +46,10 @@ contract DemocraticMayor {
     // Envelopes can be opened only after receiving the quorum
     modifier canOpen() {
         require(voting_condition.envelopes_casted == voting_condition.quorum, "Cannot open an envelope, voting quorum not reached yet");
+        // Check if already open
+        require(souls[msg.sender].opened == false, "The sender has already opened the envelope");
+        // Check if there is a casted vote
+        require(envelopes[msg.sender] != 0x0, "The sender has not casted any votes");
         _;
     }
     
@@ -56,6 +60,7 @@ contract DemocraticMayor {
     modifier canCheckOutcome() {
         require(voting_condition.winner_checked == false, "The winner has already been checked");
         require(voting_condition.envelopes_opened == voting_condition.quorum, "Cannot check the winner, need to open all the sent envelopes");
+        require(election_master == msg.sender, "Only the owner can compute results.");
         _;
     }
 
@@ -152,12 +157,6 @@ contract DemocraticMayor {
     /// @dev Need to recompute the hash to validate the envelope previously casted
     function open_envelope(uint _sigil, address _symbol) canOpen public payable {
         
-        // Check if already open
-        require(souls[msg.sender].opened == false, "The sender has already opened the envelope");
-
-        // Check if there is a casted vote
-        require(envelopes[msg.sender] != 0x0, "The sender has not casted any votes");
-
         bytes32 _casted_envelope = envelopes[msg.sender];
         
         // compute sent envelop with _sigil, _doblon and soul as crypto in msg.value 

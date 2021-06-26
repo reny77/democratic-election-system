@@ -14,10 +14,6 @@ contract("Testing DemocraticMayor", accounts => {
   let quorum = 5; // test quorum
   let testSoul = 1000; // a base test soul
 
-  for (let c of candidates) {
-      console.log(c);
-  }
-
   it("Test constructor ok", async function() {
     const instance = await DemocraticMayor.new(candidates, escrow, quorum);
   });

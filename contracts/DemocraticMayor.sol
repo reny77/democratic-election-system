@@ -31,11 +31,11 @@ contract DemocraticMayor {
         address[] voters;
     }
     
-    event NewMayor(address _candidate);
-    event DrawMayor(address[] _candidates);
-    event CandidateDeposit(address _candidate, uint _tot_val);
-    event EnvelopeCast(address _voter);
-    event EnvelopeOpen(address _voter, uint _soul, address _symbol);
+    event NewMayor(address _candidate); // for the new mayor, contains the addres of winner
+    event DrawMayor(address[] _candidates); // contains the list of candidates who tied
+    event CandidateDeposit(address _candidate, uint _tot_val); // when candidate send a deposit
+    event EnvelopeCast(address _voter); // when an envelop was casted
+    event EnvelopeOpen(address _voter, uint _soul, address _symbol); // when an envelop was casted
     
     // Someone can vote as long as the quorum is not reached
     modifier canVote() {

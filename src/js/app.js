@@ -96,8 +96,6 @@ App = {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
                         App.render();
-                        //$('#infoModalCenter').modal('hide');
-                        console.log("NewMayor=" + result.args._candidate);
                     }
                 }
             });
@@ -107,8 +105,6 @@ App = {
                     if (result.blockNumber > latestblockNumber) {
                         latestblockNumber = result.blockNumber;
                         App.render();
-                        $('#infoModalCenter').modal('hide');
-                        console.log("DrawMayor=" + result.args._candidates);
                     }
                 }
             });
